@@ -19,9 +19,9 @@ body {
     color: #000000;
 }
 
-.container {
+/*.container {
     padding-bottom: 24px;
-}
+}*/
 
 .widget-btn {
     max-height: 102px;
@@ -36,9 +36,11 @@ img.widget-image {
     max-height: 100px;
 }
 
-.draggable {
-    max-height: 64px;
-    max-width: 64px;
+.draggable, .resize-drag {
+/*    max-height: 64px;
+    max-width: 64px;*/
+    /*height: 64px;*/
+    max-width: 240px;
     background-color: #ffffff;
 }
 
@@ -51,3 +53,38 @@ img.widget-image {
 input {
     text-align: center;
 }
+
+/* Weather widget sytling starts */
+#weather .card-header {
+   
+    background-color: rgb(255, 196, 0)
+   
+}
+
+#weather .card-body{
+    padding: 0;
+}
+
+#weather .weather-row{
+    display: flex;
+    flex-direction: row;
+}
+
+
+#weather .weather-col{
+    display: flex;
+    flex-direction: column;
+    margin-left: 0px;
+}
+
+#weather img{
+    width: 100px;
+    height: 100px;
+    vertical-align: top;
+}
+
+#weather p{
+    margin-bottom: 0px;
+}
+
+/* Weather widget sytling ends */
