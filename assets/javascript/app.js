@@ -4,7 +4,11 @@ $(document).ready(function() {
     resizableDivListener();
     // this is the click function for the different news category buttons
     $(document).on("click", ".newsButtonClass", newsWidget);
+    // the click function below is to refresh the cryptocurrencies 
+    $(document).on("click", "#toRefreshBitcoin", bitcoinWidget);
 });
+
+// CONTINUE FROM HERE
 
 function clickWidgetListener() {
     $(document).on("click", ".widget-btn", function() {
@@ -27,6 +31,9 @@ function clickWidgetListener() {
                     break;
                 case "news":
                     createNewsButtons();
+                    break;
+                case "bitcoin":
+                    bitcoinWidget()
                     break;
                 default:
                     console.log("The " + widgetName+ " widget cannot be displayed on the dashboad at the moment");
@@ -54,6 +61,20 @@ function createNewsButtons() {
     $("#business").append("Business");
     $("#technology").append("Technology");
 }
+
+
+function bitcoinWidget() {
+    $("#bitcoin").append($("<div>").attr("id", "bitcoinRow"));
+    $("#bitcoinRow").addClass("row");
+    $("#bitcoinRow").append($("<div>").attr("id", "bitcoinColumn"));
+    $("#bitcoinColumn").addClass("col-xs-12");
+    $("#bitcoinColumn").append($("<div>").attr("id", "bitcoinResults"));
+    // API Key for World Coin Index API
+    var apikey = "O9zZJm0q0o0XnTTXUWGbkqI5sXdeON&label=ethbtc-ltcbtc&fiat=btc";
+    var queryUrl = "https://www.worldcoinindex.com/apiservice/ticker?key=" + apikey;
+    getData(queryUrl, generateBitcoinWidgetHtml, displayBitcoinWidget);
+}
+
 
 function newsWidget() {
     console.log(this);
@@ -86,6 +107,27 @@ function generateNewsWidgetHtml(response) {
         $("#newsResults").append(titleDiv);
         $("#newsResults").append(urlDiv);
     }
+}
+
+function generateBitcoinWidgetHtml(response) {
+    console.log(response);
+    $("#bitcoinResults").empty();
+    var coinResults = response.Markets;
+    for (var i = 0; i < coinResults.length; i++) {
+        var coinName = coinResults[i].Name;
+        var coinNameDiv = $("<p>").text("Coin: " + coinName);
+        var coinPrice = coinResults[i].Price;
+        var coinPriceDiv = $("<p>").text("Price: " + coinPrice + " CAD");
+        var br = $("<br>");
+
+        $("#bitcoinResults").append(coinNameDiv);
+        $("#bitcoinResults").append(coinPriceDiv);
+        $("#bitcoinResults").append(br);
+
+    }
+    var coinRefreshBtn = $("<button>").text("Refresh Prices");
+    coinRefreshBtn.attr("id", "toRefreshBitcoin");
+    $("#bitcoinResults").append(coinRefreshBtn);
 }
 
 
@@ -131,6 +173,10 @@ function generateWeatherWidgetHtml(response) {
 
 function displayNewsWidget(newsWidgetHtml) {
     $("#news").html(newsWidgetHtml);
+}
+
+function displayBitcoinWidget(bitcoinWidgetHtml) {
+    $("#bitcoin").html(bitcoinWidgetHtml);
 }
 
 function displayWeatherWidget(weatherWidgetHtml) {
