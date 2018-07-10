@@ -2,8 +2,9 @@ $(document).ready(function() {
     clickWidgetListener();
     // draggableDivListener();
     resizableDivListener();
-    $("#searchButton").click(function() {
-        youTubeWidget();
+    $(document).on("click", "#YTbutton",function() {
+        youTubeCreation();
+
     });
 });
 
@@ -38,18 +39,27 @@ function clickWidgetListener() {
         }
     });
 }
-
+//this is the first step to create the search button
 function youTubeWidget() {
-  
-    var newTopic = $("#input").val();
-    console.log("newtopic: " + newTopic);
+
+  var youTubeSearch = $("<input type='text' id='youTubeInput'>");
+  var youTubeButton = $("<button type='button' id='YTbutton'>Search YouTube</button>")
+  $("#youtube").append(youTubeSearch, youTubeButton);
+   
+};
+//this is followed up by the ability to create a new search function. 
+
+function youTubeCreation() {
+
+ var newTopic = $("#youTubeInput").val();
     var apiKey = "AIzaSyAYqrc7twpW4gYFibHNmf7dHCx3AHsBRqM";
     var queryUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=" + newTopic + "&key=" + apiKey;
     getData(queryUrl, generateYouTubeWidgetHtml, displayYouTubeWidget);
-};
+}
 
 function generateYouTubeWidgetHtml(response) {
     $("#youtube").empty(); 
+    youTubeWidget(); 
     for (var i = 1; i < 5; i++) {
         var videoContainer = $("<div>").addClass("row"); 
         var videoSubContainer = $("<div>").addClass("col-xs-12"); 
@@ -72,7 +82,7 @@ function generateYouTubeWidgetHtml(response) {
         videoLink.html(videoSubContainer);
 
         videoContainer.append(videoLink);
-        //need to change the div in which I append videoLink because ImgResponse does not exist. 
+        // //need to change the div in which I append videoLink because ImgResponse does not exist. 
         $("#youtube").append(videoLink);   
     }
 }    
