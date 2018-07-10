@@ -2,6 +2,8 @@ $(document).ready(function() {
     clickWidgetListener();
     // draggableDivListener();
     resizableDivListener();
+    // the click function below is to refresh the cryptocurrencies 
+    $(document).on("click", "#toRefreshBitcoin", bitcoinWidget);
 });
 
 function clickWidgetListener() {
@@ -23,6 +25,9 @@ function clickWidgetListener() {
                 case "weather":
                     weatherWidget()
                     break;
+                case "bitcoin":
+                    bitcoinWidget()
+                    break;
                 default:
                     console.log("The " + widgetName+ " widget cannot be displayed on the dashboad at the moment");
             }
@@ -30,11 +35,47 @@ function clickWidgetListener() {
     });
 }
 
+function bitcoinWidget() {
+    $("#bitcoin").append($("<div>").attr("id", "bitcoinRow"));
+    $("#bitcoinRow").addClass("row");
+    $("#bitcoinRow").append($("<div>").attr("id", "bitcoinColumn"));
+    $("#bitcoinColumn").addClass("col-xs-12");
+    $("#bitcoinColumn").append($("<div>").attr("id", "bitcoinResults"));
+    // API Key for World Coin Index API
+    var apikey = "O9zZJm0q0o0XnTTXUWGbkqI5sXdeON&label=ethbtc-ltcbtc&fiat=btc";
+    var queryUrl = "https://www.worldcoinindex.com/apiservice/ticker?key=" + apikey;
+    getData(queryUrl, generateBitcoinWidgetHtml, displayBitcoinWidget);
+}
+
+
 function weatherWidget() {
     // API Key for OpenWeatherMap API
     var apikey = "38eaa5467935a12d64ac94be4773f286";
     var queryUrl = "https://api.openweathermap.org/data/2.5/weather?q=Toronto&appid=" + apikey;
     getData(queryUrl, generateWeatherWidgetHtml, displayWeatherWidget);
+}
+
+function generateBitcoinWidgetHtml(response) {
+    console.log(response);
+    $("#bitcoinResults").empty();
+    var coinResults = response.Markets;
+    for (var i = 0; i < coinResults.length; i++) {
+        var coinName = coinResults[i].Name;
+        var coinNameDiv = $("<p>").text("Coin: " + coinName);
+        var coinPrice = coinResults[i].Price;
+        var coinPriceDiv = $("<p>").text("Price: " + coinPrice + " CAD");
+        var br = $("<br>");
+
+        $("#bitcoinResults").append(coinNameDiv);
+        $("#bitcoinResults").append(coinPriceDiv);
+        $("#bitcoinResults").append(br);
+
+    }
+    var coinRefreshBtn = $("<button>").text("Refresh Prices");
+    coinRefreshBtn.attr("id", "toRefreshBitcoin");
+    $("#bitcoinResults").append(coinRefreshBtn);
+
+
 }
 
 function generateWeatherWidgetHtml(response) {
@@ -75,6 +116,10 @@ function generateWeatherWidgetHtml(response) {
     card.append(cardBody);
 
     return card;
+}
+
+function displayBitcoinWidget(bitcoinWidgetHtml) {
+    $("#bitcoin").html(bitcoinWidgetHtml);
 }
 
 function displayWeatherWidget(weatherWidgetHtml) {
