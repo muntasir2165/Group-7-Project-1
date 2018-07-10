@@ -2,6 +2,8 @@ $(document).ready(function() {
     clickWidgetListener();
     // draggableDivListener();
     resizableDivListener();
+    // this is the click function for the different news category buttons
+    $(document).on("click", ".newsButtonClass", newsWidget);
 });
 
 function clickWidgetListener() {
@@ -23,11 +25,43 @@ function clickWidgetListener() {
                 case "weather":
                     weatherWidget()
                     break;
+                case "news":
+                    createNewsButtons();
+                    break;
                 default:
                     console.log("The " + widgetName+ " widget cannot be displayed on the dashboad at the moment");
             }
         }
     });
+}
+
+function createNewsButtons() {
+    $("#news").append($("<div>").attr("id", "newsRow"));
+    $("#newsRow").addClass("row");
+    $("#newsRow").append($("<div>").attr("id", "newsColumn"));
+    $("#newsColumn").addClass("col-xs-12");
+    var newsCategories = ["entertainment", "general", "health", "sports", "business", "technology"];
+    for (var i = 0; i < newsCategories.length; i++) {
+        var newsBtn = $("<button>").attr("data-newsType", newsCategories[i]);
+        newsBtn.addClass("newsButtonClass");
+        newsBtn.attr("id", newsCategories[i]);
+        $("#newsColumn").append(newsBtn);
+    }
+    $("#entertainment").append("Entertainment");
+    $("#general").append("General");
+    $("#health").append("Health");
+    $("#sports").append("Sports");
+    $("#business").append("Business");
+    $("#technology").append("Technology");
+}
+
+function newsWidget() {
+    console.log(this);
+    // API Key for Google News API
+    var newsType = $(this).attr("data-newsType");
+    var apikey = "86b4d5a66fce464bba3e6a4b7977c702";
+    var queryUrl = "https://newsapi.org/v2/top-headlines?country=ca&category=" + newsType + "&pageSize=5&apiKey=" + apikey;
+    getData(queryUrl, generateNewsWidgetHtml, displayNewsWidget);
 }
 
 function weatherWidget() {
@@ -36,6 +70,24 @@ function weatherWidget() {
     var queryUrl = "https://api.openweathermap.org/data/2.5/weather?q=Toronto&appid=" + apikey;
     getData(queryUrl, generateWeatherWidgetHtml, displayWeatherWidget);
 }
+
+function generateNewsWidgetHtml(response) {
+    $("#newsColumn").append($("<div>").attr("id", "newsResults"));
+    $("#newsResults").empty();
+    console.log(response);
+    results = response.articles;
+    for (var i = 0; i < results.length; i++) {
+        var title = results[i].title;
+        var titleDiv = $("<p>").text(title);
+        var url = results[i].url;
+        var urlDiv = $("<p>").append("<a href='" + url + "'target='_blank'>Read More</a>");
+        var br = $("<br>");
+        $("#newsResults").append(br);
+        $("#newsResults").append(titleDiv);
+        $("#newsResults").append(urlDiv);
+    }
+}
+
 
 function generateWeatherWidgetHtml(response) {
     var tempInfern  = (response.main.temp - 273.15) *1.80+32;
@@ -75,6 +127,10 @@ function generateWeatherWidgetHtml(response) {
     card.append(cardBody);
 
     return card;
+}
+
+function displayNewsWidget(newsWidgetHtml) {
+    $("#news").html(newsWidgetHtml);
 }
 
 function displayWeatherWidget(weatherWidgetHtml) {
