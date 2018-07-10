@@ -2,7 +2,13 @@ $(document).ready(function() {
     clickWidgetListener();
     // draggableDivListener();
     resizableDivListener();
+    $("#searchButton").click(function() {
+        youTubeWidget();
+    });
 });
+
+
+
 
 function clickWidgetListener() {
     $(document).on("click", ".widget-btn", function() {
@@ -23,6 +29,9 @@ function clickWidgetListener() {
                 case "weather":
                     weatherWidget()
                     break;
+                case "youtube" :
+                    youTubeWidget(); 
+                    break; 
                 default:
                     console.log("The " + widgetName+ " widget cannot be displayed on the dashboad at the moment");
             }
@@ -30,18 +39,59 @@ function clickWidgetListener() {
     });
 }
 
-function weatherWidget() {
-    // API Key for OpenWeatherMap API
-    var apikey = "38eaa5467935a12d64ac94be4773f286";
-    var queryUrl = "https://api.openweathermap.org/data/2.5/weather?q=Toronto&appid=" + apikey;
-    getData(queryUrl, generateWeatherWidgetHtml, displayWeatherWidget);
-}
+function youTubeWidget() {
+  
+    var newTopic = $("#input").val();
+    console.log("newtopic: " + newTopic);
+    var apiKey = "AIzaSyAYqrc7twpW4gYFibHNmf7dHCx3AHsBRqM";
+    var queryUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=" + newTopic + "&key=" + apiKey;
+    getData(queryUrl, generateYouTubeWidgetHtml, displayYouTubeWidget);
+};
 
-function generateWeatherWidgetHtml(response) {
-    var tempInfern  = (response.main.temp - 273.15) *1.80+32;
-    var paresedtemp =  Math.round(tempInfern);
-    var city= response.name;
-    var humidity = response.main.humidity;
+function generateYouTubeWidgetHtml(response) {
+    $("#youtube").empty(); 
+    for (var i = 1; i < 5; i++) {
+        var videoContainer = $("<div>").addClass("row"); 
+        var videoSubContainer = $("<div>").addClass("col-xs-12"); 
+        
+        var videoID = response.items[i].id.videoId;
+        var imgDiv = $("<div>").addClass("thumbnails"); 
+        imgDiv.html("<img src=" + response.items[i].snippet.thumbnails.default.url + ">");
+        videoSubContainer.append(imgDiv);
+        
+        var titleDiv = $("<div>").addClass("titles");
+        titleDiv.html(response.items[i].snippet.title.substring(0,60));
+        videoSubContainer.append(titleDiv);
+        
+        imgDiv.attr("value", response.items[i].id.videoId);
+        
+        var videoLink = $("<a>").addClass("a");
+        videoLink.attr("href", "https://www.youtube.com/watch?v=" + videoID);
+        videoLink.css("color", "black");
+        videoLink.attr("target", "_blank");
+        videoLink.html(videoSubContainer);
+
+        videoContainer.append(videoLink);
+        //need to change the div in which I append videoLink because ImgResponse does not exist. 
+        $("#youtube").append(videoLink);   
+    }
+}    
+    function displayYouTubeWidget(youtubeWidgetHtml) {
+        $("#youtube").append(youtubeWidgetHtml);
+    }
+    
+    function weatherWidget() {
+        // API Key for OpenWeatherMap API
+        var apikey = "38eaa5467935a12d64ac94be4773f286";
+        var queryUrl = "https://api.openweathermap.org/data/2.5/weather?q=Toronto&appid=" + apikey;
+        getData(queryUrl, generateWeatherWidgetHtml, displayWeatherWidget);
+    }
+
+    function generateWeatherWidgetHtml(response) {
+        var tempInfern  = (response.main.temp - 273.15) *1.80+32;
+        var paresedtemp =  Math.round(tempInfern);
+        var city= response.name;
+        var humidity = response.main.humidity;
     var wind=response.wind.speed;
     var weather_icon = response.weather[0].icon;
     var weather_desc = response.weather[0].description;
