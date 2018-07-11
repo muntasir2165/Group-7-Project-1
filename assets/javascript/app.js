@@ -1,39 +1,118 @@
 $(document).ready(function() {
-    clickWidgetListener();
+    clickWidgetButtonListener();
+    clearLocalStorageButtonListener(); //for local storage debugging only
     // draggableDivListener();
     resizableDivListener();
     newsCategoryButtonClickListener();
     cryptocurrencyRefreshButtonListener();
+    generateWidgetFromLocalStorage();
+    clickWidgetListener();
 });
 
-function clickWidgetListener() {
+function clickWidgetButtonListener() {
     $(document).on("click", ".widget-btn", function() {
         var widgetName = $(this).attr("data-widget");
         if ($("#" + widgetName).length !== 0){
             $("#" + widgetName).remove();
             console.log("The " + widgetName+ " has been removed from the screen");
+            updateWidgetInfoToLocalStorage("remove", widgetName);
         } else {
-            var dashboard = $("#dashboard");
-            var widgetDiv = $("<div>");
-            widgetDiv.addClass("resize-drag");
-            // widgetDiv.addClass("draggable");
-            widgetDiv.text(widgetName);
-            widgetDiv.attr("id", widgetName);
-            dashboard.append(widgetDiv);
-            switch(widgetName) {
-                case "weather":
-                    weatherWidget();
-                    break;
-                case "news":
-                    createNewsButtons();
-                    break;
-                case "bitcoin":
-                    bitcoinWidget();
-                    break;
-                default:
-                    console.log("The " + widgetName+ " widget cannot be displayed on the dashboad at the moment");
-            }
+            generateAndDisplayWidgetContainer(widgetName);
+            var addWidgetToLocalStorage = true;
+            generateAndDisplayWidget(widgetName, addWidgetToLocalStorage);
         }
+    });
+}
+
+function generateAndDisplayWidgetContainer(widgetName) {
+    var dashboard = $("#dashboard");
+    var widgetDiv = $("<div>");
+    widgetDiv.addClass("resize-drag");
+    // widgetDiv.addClass("draggable");
+    widgetDiv.text(widgetName); //for debugging purposes only
+    widgetDiv.attr("id", widgetName);
+    dashboard.append(widgetDiv);
+}
+
+function generateAndDisplayWidget(widgetName, addWidgetToLocalStorage) {
+    switch(widgetName) {
+        case "weather":
+            weatherWidget();
+            if (addWidgetToLocalStorage) {
+                updateWidgetInfoToLocalStorage("add", widgetName);
+            }
+            break;
+        case "news":
+            createNewsButtons();
+            if (addWidgetToLocalStorage) {
+                updateWidgetInfoToLocalStorage("add", widgetName);
+            }
+            break;
+        case "bitcoin":
+            bitcoinWidget();
+            if (addWidgetToLocalStorage) {
+                updateWidgetInfoToLocalStorage("add", widgetName);
+            }
+            break;
+        default:
+            console.log("The " + widgetName+ " widget cannot be displayed on the dashboad at the moment");
+    }
+}
+
+function clickWidgetListener() {
+    $(document).on("click", ".resize-drag", function() {
+        var widgetName = $(this).attr("id");
+        console.log("clickWidgetListener() for widget: " + widgetName);
+        updateWidgetInfoToLocalStorage("add", widgetName);
+    });
+}
+
+function clearLocalStorageButtonListener() {
+    $("#clear-localstorage-button").on("click", function() {
+        localStorage.clear();
+        console.log("Cleared Local Storage");
+    });
+}
+
+function getWidgetInfoFromLocalStorage() {
+    if (localStorage.getItem("widgetInfoObject")) {
+        return JSON.parse(localStorage.getItem("widgetInfoObject"));
+    } else {
+        return {};
+    }
+}
+function updateWidgetInfoToLocalStorage(update, widgetName) {
+    var widgetInfoObject = getWidgetInfoFromLocalStorage();
+    if (update === "add") {
+        var widgetInDOM = $("#" + widgetName);
+        var widgetInfo = {};
+        widgetInfo["data-x"] = widgetInDOM.attr("data-x");
+        widgetInfo["data-y"] = widgetInDOM.attr("data-y");
+        widgetInfo["style"] = widgetInDOM.attr("style");
+
+        widgetInfoObject[widgetName] = widgetInfo;
+    } else if (update === "remove") {
+        var isWidgetDeleted = delete widgetInfoObject[widgetName];
+        console.log("Deleted " + widgetName + " from Local Storage? " + isWidgetDeleted);
+    }
+    localStorage.setItem("widgetInfoObject", JSON.stringify(widgetInfoObject));
+}
+
+function generateWidgetFromLocalStorage() {
+    var widgetInfoObject = getWidgetInfoFromLocalStorage();
+    console.log("widgetInfoObject: " + widgetInfoObject);
+    $.each(widgetInfoObject, function(widgetName, widgetInfo){
+        generateAndDisplayWidgetContainer(widgetName);
+        var addWidgetToLocalStorage = false; //false because the widget already exists in local storage
+        generateAndDisplayWidget(widgetName, addWidgetToLocalStorage);
+        updateWidgetHtmlAttributes(widgetName, widgetInfo);
+    });
+}
+
+function updateWidgetHtmlAttributes(widgetName, widgetInfo) {
+    $.each(widgetInfo, function(attribute, value){
+        console.log("widgetName: " + widgetName  + " - attribute: " + attribute + " - value: " + value);
+        $("#" + widgetName).attr(attribute, value);
     });
 }
 
