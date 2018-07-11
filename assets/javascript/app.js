@@ -7,6 +7,7 @@ $(document).ready(function() {
     cryptocurrencyRefreshButtonListener();
     generateWidgetFromLocalStorage();
     clickWidgetListener();
+    searchCityWeatherEventListner();
 });
 
 function clickWidgetButtonListener() {
@@ -195,10 +196,14 @@ function displayBitcoinWidget(bitcoinWidgetHtml) {
     $("#bitcoin").html(bitcoinWidgetHtml);
 }
 
-function weatherWidget() {
+function weatherWidget(city) {
     // API Key for OpenWeatherMap API
     var apikey = "38eaa5467935a12d64ac94be4773f286";
-    var queryUrl = "https://api.openweathermap.org/data/2.5/weather?q=Toronto&appid=" + apikey;
+    var cityName = "Toronto";
+    if (city) {
+        cityName = city;
+    }
+    var queryUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&appid=" + apikey;
     getData(queryUrl, generateWeatherWidgetHtml, displayWeatherWidget);
 }
 
@@ -220,23 +225,28 @@ function generateNewsWidgetHtml(response) {
 }
 
 function generateWeatherWidgetHtml(response) {
+   
     var tempInfern  = (response.main.temp - 273.15) *1.80+32;
+    var tempInCenti = (tempInfern -32)*5/9;
+    console.log("tempInCenti :"+tempInCenti);
     var paresedtemp =  Math.round(tempInfern);
-    var city = response.name;
+    var paresedCentiTemp =  Math.round(tempInCenti);
+    var city= response.name;
     var humidity = response.main.humidity;
-    var wind = response.wind.speed;
+    var wind=response.wind.speed;
     var weather_icon = response.weather[0].icon;
     var weather_desc = response.weather[0].description;
     var weather_pressure = response.main.pressure+" hPa";
-
+    var city=response.name;
+   
     var card = $("<div>");
-    card.addClass("card border-primary mb-3");
-    card.attr("style", "max-width: 15rem");
+    card.addClass("card border-success xs-3");
+    card.attr("style", "max-width: 18rem");
     
     var cardHeader = $("<div>");
     cardHeader.addClass("card-header");
-    cardHeader.text("Weather for Toronto, ON");
-
+   
+    cardHeader.text("Weather for "+city+" , ON");
     var cardBody = $("<div>");
     cardBody.addClass("card-body text-primary weather-row");
 
@@ -246,21 +256,47 @@ function generateWeatherWidgetHtml(response) {
 
     var cardBodyWeatherInfoDiv = $("<div>");
     cardBodyWeatherInfoDiv.addClass("weather-col");
-    cardBodyWeatherInfoDiv.append($("<p>").addClass("temp").text(paresedtemp+" °F"));
+    cardBodyWeatherInfoDiv.append($("<p>").addClass("temp").text(paresedtemp+"°F "+"  "+paresedCentiTemp +"°C"));
     cardBodyWeatherInfoDiv.append($("<p>").addClass("desc").text(weather_desc));
     cardBodyWeatherInfoDiv.append($("<p>").addClass("wind").text("wind :"+wind));
     cardBodyWeatherInfoDiv.append($("<p>").addClass("humidity").text("humidity :"+humidity));
     cardBodyWeatherInfoDiv.append($("<p>").addClass("pressure").text("Pressure :"+weather_pressure));
     cardBody.append(cardBodyWeatherInfoDiv);
 
+    var cardFooter = $("<div>");
+    cardFooter.addClass("card-footer bg-transparent border-success");
+    var cityInput=$("<input>");
+    cityInput.attr("id","search-weather");
+    cityInput.attr("type","text");
+    cityInput.attr(palceholder="Venice");
+    cityInput.attr("value","");
+
+    var citySubmitButton  = $("<button>");
+    citySubmitButton.addClass("btn btn-default")
+    citySubmitButton.attr("id","search");
+    citySubmitButton.attr("type","submit");
+    citySubmitButton.text("Submit");
+    
+    cardFooter.append(cityInput);
+    cardFooter.append(citySubmitButton);
+    
     card.append(cardHeader);
     card.append(cardBody);
-
+    card.append(cardFooter);
+    //colDiv.append(card);
     return card;
 }
 
 function displayWeatherWidget(weatherWidgetHtml) {
+    $("#weather").empty();
     $("#weather").html(weatherWidgetHtml);
+}
+
+function searchCityWeatherEventListner() {
+    $("body").on("click", "#search", function () {
+        var city = $("#search-weather").val();
+        weatherWidget(city);
+  });
 }
 
 function getData(queryUrl, generateWidgetHtml, displayWidget) {
