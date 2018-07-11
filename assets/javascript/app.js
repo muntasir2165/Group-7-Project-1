@@ -1,15 +1,15 @@
 $(document).ready(function() {
-    clickWidgetListener();
-    clearLocalStorage(); //for local storage debugging only
+    clickWidgetButtonListener();
+    clearLocalStorageButtonListener(); //for local storage debugging only
     // draggableDivListener();
     resizableDivListener();
     newsCategoryButtonClickListener();
     cryptocurrencyRefreshButtonListener();
     generateWidgetFromLocalStorage();
-    // widgetAttributeChangeListener();
+    clickWidgetListener();
 });
 
-function clickWidgetListener() {
+function clickWidgetButtonListener() {
     $(document).on("click", ".widget-btn", function() {
         var widgetName = $(this).attr("data-widget");
         if ($("#" + widgetName).length !== 0){
@@ -17,15 +17,9 @@ function clickWidgetListener() {
             console.log("The " + widgetName+ " has been removed from the screen");
             updateWidgetInfoToLocalStorage("remove", widgetName);
         } else {
-            // var dashboard = $("#dashboard");
-            // var widgetDiv = $("<div>");
-            // widgetDiv.addClass("resize-drag");
-            // // widgetDiv.addClass("draggable");
-            // widgetDiv.text(widgetName); //for debugging purposes only
-            // widgetDiv.attr("id", widgetName);
-            // dashboard.append(widgetDiv);
             generateAndDisplayWidgetContainer(widgetName);
-            generateAndDisplayWidget(widgetName);
+            var addWidgetToLocalStorage = true;
+            generateAndDisplayWidget(widgetName, addWidgetToLocalStorage);
         }
     });
 }
@@ -40,70 +34,40 @@ function generateAndDisplayWidgetContainer(widgetName) {
     dashboard.append(widgetDiv);
 }
 
-function generateAndDisplayWidget(widgetName) {
+function generateAndDisplayWidget(widgetName, addWidgetToLocalStorage) {
     switch(widgetName) {
         case "weather":
             weatherWidget();
-            updateWidgetInfoToLocalStorage("add", widgetName);
+            if (addWidgetToLocalStorage) {
+                updateWidgetInfoToLocalStorage("add", widgetName);
+            }
             break;
         case "news":
             createNewsButtons();
-            updateWidgetInfoToLocalStorage("add", widgetName);
+            if (addWidgetToLocalStorage) {
+                updateWidgetInfoToLocalStorage("add", widgetName);
+            }
             break;
         case "bitcoin":
             bitcoinWidget();
-            updateWidgetInfoToLocalStorage("add", widgetName);
+            if (addWidgetToLocalStorage) {
+                updateWidgetInfoToLocalStorage("add", widgetName);
+            }
             break;
         default:
             console.log("The " + widgetName+ " widget cannot be displayed on the dashboad at the moment");
     }
 }
 
-function widgetAttributeChangeListener() {
-    // var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
-
-    // var element = $(".resize-drag");
-    // var observer = new MutationObserver(function(mutations) {
-    //   mutations.forEach(function(mutation) {
-    //     if (mutation.type == "attributes") {
-    //         console.log('The ' + mutation.attributeName + ' attribute was modified.');
-    //         // widgetDiv.attr("id", widgetName);
-    //       // updateWidgetInfoToLocalStorage("add", widgetName);
-    //     }
-    //   });
-    // });
-
-
-    // observer.observe(element, {
-    //   attributes: true //configure it to listen to attribute changes
-    // });  
-
-    // Select the node that will be observed for mutations
-    var targetNode = document.getElementById('weather');
-
-    // Options for the observer (which mutations to observe)
-    var config = { attributes: true};
-
-    // Callback function to execute when mutations are observed
-    var callback = function(mutationsList) {
-        for(var mutation of mutationsList) {
-            if (mutation.type == 'attributes') {
-                console.log('The ' + mutation.attributeName + ' attribute was modified.');
-            }
-        }
-    };
-
-    // Create an observer instance linked to the callback function
-    var observer = new MutationObserver(callback);
-
-    // Start observing the target node for configured mutations
-    observer.observe(targetNode, config);
-
-    // Later, you can stop observing
-    observer.disconnect();
+function clickWidgetListener() {
+    $(document).on("click", ".resize-drag", function() {
+        var widgetName = $(this).attr("id");
+        console.log("clickWidgetListener() for widget: " + widgetName);
+        updateWidgetInfoToLocalStorage("add", widgetName);
+    });
 }
 
-function clearLocalStorage() {
+function clearLocalStorageButtonListener() {
     $("#clear-localstorage-button").on("click", function() {
         localStorage.clear();
         console.log("Cleared Local Storage");
@@ -150,14 +114,19 @@ function generateWidgetFromLocalStorage() {
     $.each(widgetInfoObject, function(widgetName, widgetInfo){
         console.log("Generating the " + widgetName + " widget");
         generateAndDisplayWidgetContainer(widgetName);
-        generateAndDisplayWidget(widgetName);
+        // console.log("done with generateAndDisplayWidgetContainer(widgetName)");
+        var addWidgetToLocalStorage = false; //false because the widget already exists in local storage
+        // generateAndDisplayWidget(widgetName, addWidgetToLocalStorage);
+        console.log("done with generateAndDisplayWidget(widgetName)");
         updateWidgetHtmlAttributes(widgetName, widgetInfo);
+        // console.log("done with updateWidgetHtmlAttributes(widgetName, widgetInfo)");
     });
 }
 
 function updateWidgetHtmlAttributes(widgetName, widgetInfo) {
     $.each(widgetInfo, function(attribute, value){
-        $(widgetName).attr(attribute. value);
+        console.log("widgetName: " + widgetName  + " - attribute: " + attribute + " - value: " + value);
+        $("#" + widgetName).attr(attribute, value);
     });
 }
 
