@@ -31,6 +31,10 @@ img.widget-image {
     max-height: 96px;
 }
 
+#google-search-bar {
+    margin: 8px;
+}
+
 .draggable, .resize-drag {
 /*    max-height: 64px;
     max-width: 64px;*/
@@ -46,7 +50,7 @@ img.widget-image {
 }
 
 input {
-    text-align: center;
+    /*text-align: center;*/
 }
 
 /* Weather widget sytling starts */
