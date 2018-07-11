@@ -82,25 +82,15 @@ function getWidgetInfoFromLocalStorage() {
     }
 }
 function updateWidgetInfoToLocalStorage(update, widgetName) {
-    // <div 
-    // class="resize-drag" 
-    // id="weather" 
-    // data-x="337.08203125" 
-    // data-y="59.9140625" 
-    // style="transform: translate(337.082px, 59.9141px);">
     var widgetInfoObject = getWidgetInfoFromLocalStorage();
     if (update === "add") {
         var widgetInDOM = $("#" + widgetName);
         var widgetInfo = {};
-        // widgetInfo["class"] = widgetInDOM.attr("class");
-        // widgetInfo["id"] = widgetInDOM.attr("id");
         widgetInfo["data-x"] = widgetInDOM.attr("data-x");
         widgetInfo["data-y"] = widgetInDOM.attr("data-y");
         widgetInfo["style"] = widgetInDOM.attr("style");
 
-        console.log("inside updateWidgetInfoToLocalStorage(): widgetName: " + widgetName +": widgetInfo: " + JSON.stringify(widgetInfo));
         widgetInfoObject[widgetName] = widgetInfo;
-        // localStorage.setItem("widgetInfoObject", JSON.stringify(widgetInfoObject));
     } else if (update === "remove") {
         var isWidgetDeleted = delete widgetInfoObject[widgetName];
         console.log("Deleted " + widgetName + " from Local Storage? " + isWidgetDeleted);
@@ -112,14 +102,10 @@ function generateWidgetFromLocalStorage() {
     var widgetInfoObject = getWidgetInfoFromLocalStorage();
     console.log("widgetInfoObject: " + widgetInfoObject);
     $.each(widgetInfoObject, function(widgetName, widgetInfo){
-        console.log("Generating the " + widgetName + " widget");
         generateAndDisplayWidgetContainer(widgetName);
-        // console.log("done with generateAndDisplayWidgetContainer(widgetName)");
         var addWidgetToLocalStorage = false; //false because the widget already exists in local storage
         generateAndDisplayWidget(widgetName, addWidgetToLocalStorage);
-        // console.log("done with generateAndDisplayWidget(widgetName)");
         updateWidgetHtmlAttributes(widgetName, widgetInfo);
-        // console.log("done with updateWidgetHtmlAttributes(widgetName, widgetInfo)");
     });
 }
 
