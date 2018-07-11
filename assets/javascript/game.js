@@ -58,7 +58,7 @@ function generateGifWidgetHtml(response) {
 }
 
 function displayGifWidget(gifWidgetHtml) {
-    // $("#gif").append(gifWidgetHtml);
+    $("#gif").append(gifWidgetHtml);
 }
 
 
