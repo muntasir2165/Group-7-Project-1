@@ -8,8 +8,6 @@ $(document).ready(function() {
     $(document).on("click", "#toRefreshBitcoin", bitcoinWidget);
 });
 
-// CONTINUE FROM HERE
-
 function clickWidgetListener() {
     $(document).on("click", ".widget-btn", function() {
         var widgetName = $(this).attr("data-widget");
@@ -20,10 +18,9 @@ function clickWidgetListener() {
             var dashboard = $("#dashboard");
             var widgetDiv = $("<div>");
             widgetDiv.addClass("resize-drag");
+            // widgetDiv.addClass("draggable");
             widgetDiv.text(widgetName);
             widgetDiv.attr("id", widgetName);
-            // dashboard.append("<div class=\"draggable\">" + widget + "</div>");
-            // dashboard.append("<div class=\"resize-drag\">" + widget + "</div>");
             dashboard.append(widgetDiv);
             switch(widgetName) {
                 case "weather":
@@ -293,6 +290,5 @@ function resizableDivListener() {
 
         target.setAttribute('data-x', x);
         target.setAttribute('data-y', y);
-        // target.textContent = Math.round(event.rect.width) + '\u00D7' + Math.round(event.rect.height);
     });
 }

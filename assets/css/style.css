@@ -6,41 +6,36 @@
 }*/
 
 body {
-	/*  Background fallback in case of IE8 & down, or in case video doesn't load, such as with slower connections  */
 	background-color: #464646;
-
-    /*This is what makes the background image rescale based on the container's size
-    Use vendor prefixes to support different browsers*/
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
-
     color: #000000;
 }
 
-/*.container {
-    padding-bottom: 24px;
-}*/
+.container {
+    margin-bottom: 24px;
+}
+
+.row {
+   margin-left: 0;
+   margin-right: 0;
+ }
 
 .widget-btn {
-    max-height: 102px;
-    max-width: 102px;
-    background-color: #ffffff;
+    max-height: 96px;
+    max-width: 96px;
     padding: 0px;
     background-color: #464646;
 }
 
 img.widget-image {
-    max-width: 100px;
-    max-height: 100px;
+    max-width: 96px;
+    max-height: 96px;
 }
 
 .draggable, .resize-drag {
 /*    max-height: 64px;
     max-width: 64px;*/
     /*height: 64px;*/
-    max-width: 240px;
+    width: 240px;
     background-color: #ffffff;
 }
 
@@ -55,6 +50,11 @@ input {
 }
 
 /* Weather widget sytling starts */
+#weather {
+    max-width: 240px;
+    max-height: 160px;
+}
+
 #weather .card-header {
    
     background-color: rgb(255, 196, 0)
@@ -86,5 +86,4 @@ input {
 #weather p{
     margin-bottom: 0px;
 }
-
 /* Weather widget sytling ends */
