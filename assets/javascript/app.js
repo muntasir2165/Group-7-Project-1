@@ -116,8 +116,8 @@ function generateWidgetFromLocalStorage() {
         generateAndDisplayWidgetContainer(widgetName);
         // console.log("done with generateAndDisplayWidgetContainer(widgetName)");
         var addWidgetToLocalStorage = false; //false because the widget already exists in local storage
-        // generateAndDisplayWidget(widgetName, addWidgetToLocalStorage);
-        console.log("done with generateAndDisplayWidget(widgetName)");
+        generateAndDisplayWidget(widgetName, addWidgetToLocalStorage);
+        // console.log("done with generateAndDisplayWidget(widgetName)");
         updateWidgetHtmlAttributes(widgetName, widgetInfo);
         // console.log("done with updateWidgetHtmlAttributes(widgetName, widgetInfo)");
     });
