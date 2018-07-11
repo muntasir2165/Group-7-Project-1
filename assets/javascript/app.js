@@ -2,10 +2,8 @@ $(document).ready(function() {
     clickWidgetListener();
     // draggableDivListener();
     resizableDivListener();
-    // this is the click function for the different news category buttons
-    $(document).on("click", ".newsButtonClass", newsWidget);
-    // the click function below is to refresh the cryptocurrencies 
-    $(document).on("click", "#toRefreshBitcoin", bitcoinWidget);
+    newsCategoryButtonClickListener();
+    cryptocurrencyRefreshButtonListener();
 });
 
 function clickWidgetListener() {
@@ -24,19 +22,23 @@ function clickWidgetListener() {
             dashboard.append(widgetDiv);
             switch(widgetName) {
                 case "weather":
-                    weatherWidget()
+                    weatherWidget();
                     break;
                 case "news":
                     createNewsButtons();
                     break;
                 case "bitcoin":
-                    bitcoinWidget()
+                    bitcoinWidget();
                     break;
                 default:
                     console.log("The " + widgetName+ " widget cannot be displayed on the dashboad at the moment");
             }
         }
     });
+}
+
+function newsCategoryButtonClickListener() {
+    $(document).on("click", ".newsButtonClass", newsWidget);
 }
 
 function createNewsButtons() {
@@ -59,20 +61,6 @@ function createNewsButtons() {
     $("#technology").append("Technology");
 }
 
-
-function bitcoinWidget() {
-    $("#bitcoin").append($("<div>").attr("id", "bitcoinRow"));
-    $("#bitcoinRow").addClass("row");
-    $("#bitcoinRow").append($("<div>").attr("id", "bitcoinColumn"));
-    $("#bitcoinColumn").addClass("col-xs-12");
-    $("#bitcoinColumn").append($("<div>").attr("id", "bitcoinResults"));
-    // API Key for World Coin Index API
-    var apikey = "O9zZJm0q0o0XnTTXUWGbkqI5sXdeON&label=ethbtc-ltcbtc&fiat=btc";
-    var queryUrl = "https://www.worldcoinindex.com/apiservice/ticker?key=" + apikey;
-    getData(queryUrl, generateBitcoinWidgetHtml, displayBitcoinWidget);
-}
-
-
 function newsWidget() {
     console.log(this);
     // API Key for Google News API
@@ -80,6 +68,52 @@ function newsWidget() {
     var apikey = "86b4d5a66fce464bba3e6a4b7977c702";
     var queryUrl = "https://newsapi.org/v2/top-headlines?country=ca&category=" + newsType + "&pageSize=5&apiKey=" + apikey;
     getData(queryUrl, generateNewsWidgetHtml, displayNewsWidget);
+}
+
+function displayNewsWidget(newsWidgetHtml) {
+    $("#news").html(newsWidgetHtml);
+}
+
+function cryptocurrencyRefreshButtonListener() {
+    $(document).on("click", "#toRefreshBitcoin", bitcoinWidget);
+}
+
+function bitcoinWidget() {
+    $("#bitcoin").append($("<div>").attr("id", "bitcoinRow"));
+    $("#bitcoinRow").addClass("row");
+    $("#bitcoinRow").append($("<div>").attr("id", "bitcoinColumn"));
+    $("#bitcoinColumn").addClass("col-xs-12");
+    $("#bitcoinColumn").append($("<div>").attr("id", "bitcoinResults"));
+    
+    // API Key for World Coin Index API
+    var apikey = "O9zZJm0q0o0XnTTXUWGbkqI5sXdeON&label=ethbtc-ltcbtc&fiat=btc";
+    var queryUrl = "https://www.worldcoinindex.com/apiservice/ticker?key=" + apikey;
+    getData(queryUrl, generateBitcoinWidgetHtml, displayBitcoinWidget);
+}
+
+function generateBitcoinWidgetHtml(response) {
+    console.log(response);
+    $("#bitcoinResults").empty();
+    var coinResults = response.Markets;
+    for (var i = 0; i < coinResults.length; i++) {
+        var coinName = coinResults[i].Name;
+        var coinNameDiv = $("<p>").text("Coin: " + coinName);
+        var coinPrice = coinResults[i].Price;
+        var coinPriceDiv = $("<p>").text("Price: " + coinPrice + " CAD");
+        var br = $("<br>");
+
+        $("#bitcoinResults").append(coinNameDiv);
+        $("#bitcoinResults").append(coinPriceDiv);
+        $("#bitcoinResults").append(br);
+
+    }
+    var coinRefreshBtn = $("<button>").text("Refresh Prices");
+    coinRefreshBtn.attr("id", "toRefreshBitcoin");
+    $("#bitcoinResults").append(coinRefreshBtn);
+}
+
+function displayBitcoinWidget(bitcoinWidgetHtml) {
+    $("#bitcoin").html(bitcoinWidgetHtml);
 }
 
 function weatherWidget() {
@@ -106,34 +140,12 @@ function generateNewsWidgetHtml(response) {
     }
 }
 
-function generateBitcoinWidgetHtml(response) {
-    console.log(response);
-    $("#bitcoinResults").empty();
-    var coinResults = response.Markets;
-    for (var i = 0; i < coinResults.length; i++) {
-        var coinName = coinResults[i].Name;
-        var coinNameDiv = $("<p>").text("Coin: " + coinName);
-        var coinPrice = coinResults[i].Price;
-        var coinPriceDiv = $("<p>").text("Price: " + coinPrice + " CAD");
-        var br = $("<br>");
-
-        $("#bitcoinResults").append(coinNameDiv);
-        $("#bitcoinResults").append(coinPriceDiv);
-        $("#bitcoinResults").append(br);
-
-    }
-    var coinRefreshBtn = $("<button>").text("Refresh Prices");
-    coinRefreshBtn.attr("id", "toRefreshBitcoin");
-    $("#bitcoinResults").append(coinRefreshBtn);
-}
-
-
 function generateWeatherWidgetHtml(response) {
     var tempInfern  = (response.main.temp - 273.15) *1.80+32;
     var paresedtemp =  Math.round(tempInfern);
-    var city= response.name;
+    var city = response.name;
     var humidity = response.main.humidity;
-    var wind=response.wind.speed;
+    var wind = response.wind.speed;
     var weather_icon = response.weather[0].icon;
     var weather_desc = response.weather[0].description;
     var weather_pressure = response.main.pressure+" hPa";
@@ -166,14 +178,6 @@ function generateWeatherWidgetHtml(response) {
     card.append(cardBody);
 
     return card;
-}
-
-function displayNewsWidget(newsWidgetHtml) {
-    $("#news").html(newsWidgetHtml);
-}
-
-function displayBitcoinWidget(bitcoinWidgetHtml) {
-    $("#bitcoin").html(bitcoinWidgetHtml);
 }
 
 function displayWeatherWidget(weatherWidgetHtml) {
