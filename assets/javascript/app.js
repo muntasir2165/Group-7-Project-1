@@ -8,7 +8,15 @@ $(document).ready(function() {
     generateWidgetFromLocalStorage();
     clickWidgetListener();
     searchCityWeatherEventListner();
+    clock();
 });
+
+function clock() {
+    setInterval(function(){
+        $("#clock").text(moment().format("dddd MMMM Do YYYY h:mm:ss A")); 
+        }, 
+    1000);
+}
 
 function clickWidgetButtonListener() {
     $(document).on("click", ".widget-btn", function() {
@@ -101,7 +109,7 @@ function updateWidgetInfoToLocalStorage(update, widgetName) {
 
 function generateWidgetFromLocalStorage() {
     var widgetInfoObject = getWidgetInfoFromLocalStorage();
-    console.log("widgetInfoObject: " + widgetInfoObject);
+    // console.log("widgetInfoObject: " + widgetInfoObject);
     $.each(widgetInfoObject, function(widgetName, widgetInfo){
         generateAndDisplayWidgetContainer(widgetName);
         var addWidgetToLocalStorage = false; //false because the widget already exists in local storage
@@ -112,7 +120,7 @@ function generateWidgetFromLocalStorage() {
 
 function updateWidgetHtmlAttributes(widgetName, widgetInfo) {
     $.each(widgetInfo, function(attribute, value){
-        console.log("widgetName: " + widgetName  + " - attribute: " + attribute + " - value: " + value);
+        // console.log("widgetName: " + widgetName  + " - attribute: " + attribute + " - value: " + value);
         $("#" + widgetName).attr(attribute, value);
     });
 }
