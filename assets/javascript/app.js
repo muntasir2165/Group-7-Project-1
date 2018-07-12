@@ -9,6 +9,10 @@ $(document).ready(function() {
     clickWidgetListener();
     searchCityWeatherEventListner();
     clock();
+    $(document).on("click", "#YTbutton",function() {
+        event.preventDefault();
+        youTubeCreation();
+    }); 
 });
 
 function clock() {
@@ -63,6 +67,12 @@ function generateAndDisplayWidget(widgetName, addWidgetToLocalStorage) {
                 updateWidgetInfoToLocalStorage("add", widgetName);
             }
             break;
+        case "youtube":
+            youTubeWidget(); 
+            if (addWidgetToLocalStorage) {
+                updateWidgetInfoToLocalStorage("add", widgetName);
+            }
+            break; 
         default:
             console.log("The " + widgetName+ " widget cannot be displayed on the dashboad at the moment");
     }
@@ -230,6 +240,63 @@ function generateNewsWidgetHtml(response) {
         $("#newsResults").append(titleDiv);
         $("#newsResults").append(urlDiv);
     }
+}
+
+function youTubeWidget() {
+
+    var br = $("<br><br>");
+    var breaker = $("<br><br>");
+    var form = $("<form>").attr("id", "YTform");
+    var youTubeSearch = $("<input>").attr("type", "text");
+    youTubeSearch.attr("id", "youTubeInput");
+    var youTubeButton = $("<input>").attr("type", "submit");
+    youTubeButton.attr("id", "YTbutton");
+    youTubeButton.attr("value", "Search YouTube!"); 
+
+    var videoContainer = $("<div>").addClass("row"); 
+    videoContainer.attr("id", "videoRow");
+    var videoSubContainer = $("<div>").addClass("col-xs-12"); 
+    videoSubContainer.attr("id", "videoColumn");
+    var allVideosDiv = $("<div>").attr("id", "allVideos");
+    $("#youtube").append(videoContainer);
+    $("#videoRow").append(videoSubContainer);
+    $("#videoColumn").append(form);
+    $("#videoColumn").append(breaker, allVideosDiv);
+    $("#YTform").append(youTubeSearch, br);
+    $("#YTform").append(youTubeButton);
+
+  };
+
+  
+function youTubeCreation() {
+    console.log("Hi");
+    var newTopic = $("#youTubeInput").val();
+    var apiKey = "AIzaSyAYqrc7twpW4gYFibHNmf7dHCx3AHsBRqM";
+    var queryUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=" + newTopic + "&key=" + apiKey;
+    getData(queryUrl, generateYouTubeWidgetHtml, displayYouTubeWidget);
+}
+
+function generateYouTubeWidgetHtml(response) {
+    $("#allVideos").empty(); 
+    for (var i = 1; i < 5; i++) {
+        console.log(response);
+        var videoID = response.items[i].id.videoId;
+        var imgDiv = $("<div>").addClass("thumbnails"); 
+        var br = $("<br>")
+        imgDiv.html("<img src=" + response.items[i].snippet.thumbnails.default.url + ">");
+        $("#allVideos").append(imgDiv, br);
+
+        var titleID = response.items[i].snippet.title.substring(0,60); 
+
+        var videoLink = $("<p>").append("<a href='" + "https://www.youtube.com/watch?v=" + videoID+ "'target='_blank'>" + titleID + "</a>");
+  
+        $("#allVideos").append(videoLink);
+
+    }
+}   
+
+function displayYouTubeWidget(youtubeWidgetHtml) {
+    $("#youtube").append(youtubeWidgetHtml);
 }
 
 function generateWeatherWidgetHtml(response) {
