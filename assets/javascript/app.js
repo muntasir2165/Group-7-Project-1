@@ -10,10 +10,7 @@ $(document).ready(function() {
     searchCityWeatherEventListner();
     reStartClickedEventListner();
     clock();
-    $(document).on("click", "#YTbutton",function() {
-        event.preventDefault();
-        youTubeCreation();
-    }); 
+    YTbuttonClickListener(); 
 });
 
 function clock() {
@@ -126,7 +123,6 @@ function updateWidgetInfoToLocalStorage(update, widgetName) {
 
 function generateWidgetFromLocalStorage() {
     var widgetInfoObject = getWidgetInfoFromLocalStorage();
-    // console.log("widgetInfoObject: " + widgetInfoObject);
     $.each(widgetInfoObject, function(widgetName, widgetInfo){
         generateAndDisplayWidgetContainer(widgetName);
         var addWidgetToLocalStorage = false; //false because the widget already exists in local storage
@@ -137,7 +133,6 @@ function generateWidgetFromLocalStorage() {
 
 function updateWidgetHtmlAttributes(widgetName, widgetInfo) {
     $.each(widgetInfo, function(attribute, value){
-        // console.log("widgetName: " + widgetName  + " - attribute: " + attribute + " - value: " + value);
         $("#" + widgetName).attr(attribute, value);
     });
 }
@@ -232,80 +227,6 @@ function weatherWidget(city) {
     getData(queryUrl, generateWeatherWidgetHtml, displayWeatherWidget);
 }
 
-function generateNewsWidgetHtml(response) {
-    $("#newsColumn").append($("<div>").attr("id", "newsResults"));
-    $("#newsResults").empty();
-    console.log(response);
-    results = response.articles;
-    for (var i = 0; i < results.length; i++) {
-        var title = results[i].title;
-        var titleDiv = $("<p>").text(title);
-        var url = results[i].url;
-        var urlDiv = $("<p>").append("<a href='" + url + "'target='_blank'>Read More</a>");
-        var br = $("<br>");
-        $("#newsResults").append(br);
-        $("#newsResults").append(titleDiv);
-        $("#newsResults").append(urlDiv);
-    }
-}
-
-function youTubeWidget() {
-
-    var br = $("<br><br>");
-    var breaker = $("<br><br>");
-    var form = $("<form>").attr("id", "YTform");
-    var youTubeSearch = $("<input>").attr("type", "text");
-    youTubeSearch.attr("id", "youTubeInput");
-    var youTubeButton = $("<input>").attr("type", "submit");
-    youTubeButton.attr("id", "YTbutton");
-    youTubeButton.attr("value", "Search YouTube!"); 
-
-    var videoContainer = $("<div>").addClass("row"); 
-    videoContainer.attr("id", "videoRow");
-    var videoSubContainer = $("<div>").addClass("col-xs-12"); 
-    videoSubContainer.attr("id", "videoColumn");
-    var allVideosDiv = $("<div>").attr("id", "allVideos");
-    $("#youtube").append(videoContainer);
-    $("#videoRow").append(videoSubContainer);
-    $("#videoColumn").append(form);
-    $("#videoColumn").append(breaker, allVideosDiv);
-    $("#YTform").append(youTubeSearch, br);
-    $("#YTform").append(youTubeButton);
-
-  };
-
-  
-function youTubeCreation() {
-    console.log("Hi");
-    var newTopic = $("#youTubeInput").val();
-    var apiKey = "AIzaSyAYqrc7twpW4gYFibHNmf7dHCx3AHsBRqM";
-    var queryUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=" + newTopic + "&key=" + apiKey;
-    getData(queryUrl, generateYouTubeWidgetHtml, displayYouTubeWidget);
-}
-
-function generateYouTubeWidgetHtml(response) {
-    $("#allVideos").empty(); 
-    for (var i = 1; i < 5; i++) {
-        console.log(response);
-        var videoID = response.items[i].id.videoId;
-        var imgDiv = $("<div>").addClass("thumbnails"); 
-        var br = $("<br>")
-        imgDiv.html("<img src=" + response.items[i].snippet.thumbnails.default.url + ">");
-        $("#allVideos").append(imgDiv, br);
-
-        var titleID = response.items[i].snippet.title.substring(0,60); 
-
-        var videoLink = $("<p>").append("<a href='" + "https://www.youtube.com/watch?v=" + videoID+ "'target='_blank'>" + titleID + "</a>");
-  
-        $("#allVideos").append(videoLink);
-
-    }
-}   
-
-function displayYouTubeWidget(youtubeWidgetHtml) {
-    $("#youtube").append(youtubeWidgetHtml);
-}
-
 function generateWeatherWidgetHtml(response) {
    
     var tempInfern  = (response.main.temp - 273.15) *1.80+32;
@@ -380,12 +301,92 @@ function searchCityWeatherEventListner() {
         weatherWidget(city);
   });
 }
-// Trivia Widget
 
+function generateNewsWidgetHtml(response) {
+    $("#newsColumn").append($("<div>").attr("id", "newsResults"));
+    $("#newsResults").empty();
+    console.log(response);
+    results = response.articles;
+    for (var i = 0; i < results.length; i++) {
+        var title = results[i].title;
+        var titleDiv = $("<p>").text(title);
+        var url = results[i].url;
+        var urlDiv = $("<p>").append("<a href='" + url + "'target='_blank'>Read More</a>");
+        var br = $("<br>");
+        $("#newsResults").append(br);
+        $("#newsResults").append(titleDiv);
+        $("#newsResults").append(urlDiv);
+    }
+}
+
+function YTbuttonClickListener() {
+    $(document).on("click", "#YTbutton",function() {
+        event.preventDefault();
+        youTubeCreation();
+    });
+}
+
+function youTubeWidget() {
+
+    var br = $("<br><br>");
+    var breaker = $("<br><br>");
+    var form = $("<form>").attr("id", "YTform");
+    var youTubeSearch = $("<input>").attr("type", "text");
+    youTubeSearch.attr("id", "youTubeInput");
+    var youTubeButton = $("<input>").attr("type", "submit");
+    youTubeButton.attr("id", "YTbutton");
+    youTubeButton.attr("value", "Search YouTube!"); 
+
+    var videoContainer = $("<div>").addClass("row"); 
+    videoContainer.attr("id", "videoRow");
+    var videoSubContainer = $("<div>").addClass("col-xs-12"); 
+    videoSubContainer.attr("id", "videoColumn");
+    var allVideosDiv = $("<div>").attr("id", "allVideos");
+    $("#youtube").append(videoContainer);
+    $("#videoRow").append(videoSubContainer);
+    $("#videoColumn").append(form);
+    $("#videoColumn").append(breaker, allVideosDiv);
+    $("#YTform").append(youTubeSearch, br);
+    $("#YTform").append(youTubeButton);
+
+  };
+
+  
+function youTubeCreation() {
+    console.log("Hi");
+    var newTopic = $("#youTubeInput").val();
+    var apiKey = "AIzaSyAYqrc7twpW4gYFibHNmf7dHCx3AHsBRqM";
+    var queryUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=" + newTopic + "&key=" + apiKey;
+    getData(queryUrl, generateYouTubeWidgetHtml, displayYouTubeWidget);
+}
+
+function generateYouTubeWidgetHtml(response) {
+    $("#allVideos").empty(); 
+    for (var i = 1; i < 5; i++) {
+        console.log(response);
+        var videoID = response.items[i].id.videoId;
+        var imgDiv = $("<div>").addClass("thumbnails"); 
+        var br = $("<br>")
+        imgDiv.html("<img src=" + response.items[i].snippet.thumbnails.default.url + ">");
+        $("#allVideos").append(imgDiv, br);
+
+        var titleID = response.items[i].snippet.title.substring(0,60); 
+
+        var videoLink = $("<p>").append("<a href='" + "https://www.youtube.com/watch?v=" + videoID+ "'target='_blank'>" + titleID + "</a>");
+  
+        $("#allVideos").append(videoLink);
+
+    }
+}   
+
+function displayYouTubeWidget(youtubeWidgetHtml) {
+    $("#youtube").append(youtubeWidgetHtml);
+}
 
 function triviaWidget() {
     getData("https://opentdb.com/api.php?amount=10", generateTriviaHTML, displayTriviaWidget);
 }
+
 var question_number = 0;
 var triviaArray = [];
 var correctAnswers = 0;
@@ -579,8 +580,6 @@ function displayTriviaWidget(triviaWidgetHtml) {
     $("#trivia").html(triviaWidgetHtml);
     loadNextQuiz();
 }
-
-// Trivia Widget ends
 
 function getData(queryUrl, generateWidgetHtml, displayWidget) {
     console.log(queryUrl);
