@@ -53,9 +53,10 @@ img.widget-image {
     background-color: #a4a4a4;
 }
 
-input {
-    /*text-align: center;*/
-}
+/*input {
+    text-align: center;
+}*/
+
 /* Trivia widget styling starts*/
 #trivia .card-body{
     padding: 0;
@@ -94,7 +95,7 @@ input {
    background-color: white;
 }
 
-/* tirvia styling ends  */
+/* Trivia widget styling ends  */
 
 /* Weather widget sytling starts */
 #weather {
