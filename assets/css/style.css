@@ -56,17 +56,50 @@ img.widget-image {
 input {
     /*text-align: center;*/
 }
+/* Trivia widget styling starts*/
+#trivia .card-body{
+    padding: 0;
+}
+
+#trivia .questions, .answers, #showAnswer, #comment, #correctAnswerComment, #nextQuiz,.allDone,.answerP{
+    text-align: center;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 15px;
+    color: black;
+}
+
+#trivia #trivia_header{
+    text-align: center;
+}
+
+#trivia #nextQuiz{
+   text-align: center;
+   width: 75px;
+   margin-top: 10px;
+   margin-bottom: 10px;
+   left: 40px;
+   font-size: 10px;
+   color: black;
+   background-color: white
+}
+
+#trivia #reStartGame{
+    text-align: center;
+    width: 75px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+   left: 40px;
+   font-size: 10px;
+   color: black;
+   background-color: white;
+}
+
+/* tirvia styling ends  */
 
 /* Weather widget sytling starts */
 #weather {
     max-width: 240px;
     max-height: 160px;
-}
-
-#weather .card-header {
-   
-    background-color: rgb(255, 196, 0)
-   
 }
 
 #weather .card-body{
