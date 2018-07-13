@@ -1,10 +1,14 @@
 var database = null;
 var registeredUserNameArray =[];
+var registeredUserWidgetInfoObject ={};
+var authenticatedUsername = "";
 
 $(document).ready(function() {
     // a variable to reference the database
     database = initializeFirebase();
     deleteDatabaseInfo();
+    saveWidgetStateButtonClickListener();
+    authenticateButtonClickListener();
     registerButtonClickListener();
     // getUserNameListing();
     updateRegisteredUserNameArray();
@@ -34,6 +38,47 @@ function initializeFirebase() {
     };
     firebase.initializeApp(config);
     return firebase.database();
+}
+
+function saveWidgetStateButtonClickListener() {
+    $("#save-widget-state-button").on("click", function() {
+        event.preventDefault();
+        if (!authenticatedUsername) {
+            displayFeedback("You have not registered and/or authenticated yet");
+        } else {
+            saveUserWidgetInfoToDatabase(authenticatedUsername);
+            displayFeedback("Saved widget information");
+            setTimeout(displayFeedback, 10 * 1000);
+        }
+    });   
+}
+
+function saveUserWidgetInfoToDatabase(username) {
+    database.ref().child("users/" + username).update(getWidgetInfoFromLocalStorage());
+}
+
+function authenticateButtonClickListener() {
+    $("#authenticate-button").on("click", function() {
+        event.preventDefault();
+        var username = $("#username").val();
+        if (!isUsernameValid(username)) {
+            displayFeedback("Please enter a valid username that must be non-empty strings and can't contain \".\", \"#\", \"$\", \"[\", or \"]\"");
+            // setTimeout(displayFeedback, 10 * 1000);
+        } else if (isUsernameUnique(username)) {
+            displayFeedback("The username " + username + " is not registered yet");
+        }
+        else {
+            authenticatedUsername = username;
+            if ("No preference set yet" !== registeredUserWidgetInfoObject[authenticatedUsername]) {
+                setWidgetInfoToLocalStorage(registeredUserWidgetInfoObject[authenticatedUsername]);
+                generateWidgetFromLocalStorage();
+            }
+            displayFeedback("Welcome back " + authenticatedUsername + "! You widgets are now displayed!");
+            setTimeout(displayFeedback, 10 * 1000);
+        }
+        $("#username").val("");
+        // database.ref().child("users").remove();
+    });   
 }
 
 function registerButtonClickListener() {
@@ -83,7 +128,6 @@ function isUsernameUnique(username) {
     return true;
 }
 
-
 // function getUserNameListing() {
 //     database.ref().once("value", function(snapshot) {
 //         console.log("inside getUserNameListing()");
@@ -104,14 +148,16 @@ function updateRegisteredUserNameArray() {
         if (snapshot.val() && snapshot.val()["users"]) {
             jQuery.each(snapshot.val()["users"], function(username, value) {
                 registeredUserNameArray.push(username);
+                registeredUserWidgetInfoObject[username] = value;
             });
             console.log("registeredUserNameArray: " + registeredUserNameArray);
+            console.log("registeredUserWidgetInfoObject: " + registeredUserWidgetInfoObject);
         }
     });
 }
 
 function registerUsername(username) {
-    database.ref().child("users/" + username).set("Registered the username " + username);
+    database.ref().child("users/" + username).set("No preference set yet");
 }
 
 function displayFeedback(message) {
@@ -218,6 +264,11 @@ function getWidgetInfoFromLocalStorage() {
         return {};
     }
 }
+
+function setWidgetInfoToLocalStorage(widgetInfoObject) {
+    localStorage.setItem("widgetInfoObject", JSON.stringify(widgetInfoObject));
+}
+
 function updateWidgetInfoToLocalStorage(update, widgetName) {
     var widgetInfoObject = getWidgetInfoFromLocalStorage();
     if (update === "add") {
@@ -232,7 +283,7 @@ function updateWidgetInfoToLocalStorage(update, widgetName) {
         var isWidgetDeleted = delete widgetInfoObject[widgetName];
         console.log("Deleted " + widgetName + " from Local Storage? " + isWidgetDeleted);
     }
-    localStorage.setItem("widgetInfoObject", JSON.stringify(widgetInfoObject));
+    setWidgetInfoToLocalStorage(widgetInfoObject);
 }
 
 function generateWidgetFromLocalStorage() {
