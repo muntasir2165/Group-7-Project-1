@@ -1,4 +1,14 @@
+var database = null;
+var registeredUserNameArray =[];
+
 $(document).ready(function() {
+    // a variable to reference the database
+    database = initializeFirebase();
+    deleteDatabaseInfo();
+    registerButtonClickListener();
+    // getUserNameListing();
+    updateRegisteredUserNameArray();
+    
     clickWidgetButtonListener();
     clearLocalStorageButtonListener(); //for local storage debugging only
     // draggableDivListener();
@@ -13,11 +23,115 @@ $(document).ready(function() {
     YTbuttonClickListener(); 
 });
 
+function initializeFirebase() {
+    var config = {
+        apiKey: "AIzaSyCyw-VuXSaB1S88dOXCjlg1z56xg66yyBI",
+        authDomain: "personalized-dahsboard.firebaseapp.com",
+        databaseURL: "https://personalized-dahsboard.firebaseio.com",
+        projectId: "personalized-dahsboard",
+        storageBucket: "",
+        messagingSenderId: "135361166750"
+    };
+    firebase.initializeApp(config);
+    return firebase.database();
+}
+
+function registerButtonClickListener() {
+    $("#register-button").on("click", function() {
+        event.preventDefault();
+        var username = $("#username").val();
+        if (!isUsernameValid(username)) {
+            displayFeedback("Please enter a valid username that must be non-empty strings and can't contain \".\", \"#\", \"$\", \"[\", or \"]\"");
+            // setTimeout(displayFeedback, 10 * 1000);
+        } else if (!isUsernameUnique(username)) {
+            displayFeedback("The username " + username + " is already registered");
+        }
+        else {
+            registerUsername(username);
+            displayFeedback("Registered the username: " + username);
+            setTimeout(displayFeedback, 10 * 1000);
+        }
+        $("#username").val("");
+        // database.ref().child("users").remove();
+    });   
+}
+
+function isUsernameValid(username) {
+    if (username === "") {
+        return false;
+    }
+
+    var invalidCharacterArray = [".", "#", "$", "[", "]"];
+    for (var i=0; i<invalidCharacterArray.length; i++) {
+        var invalidCharacter = invalidCharacterArray[i];
+        if (username.indexOf(invalidCharacter) !== -1) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function isUsernameUnique(username) {
+    for (var i=0; i<registeredUserNameArray.length; i++) {
+        var currentUsername = registeredUserNameArray[i];
+        if (username === currentUsername) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+// function getUserNameListing() {
+//     database.ref().once("value", function(snapshot) {
+//         console.log("inside getUserNameListing()");
+//         registeredUserNameArray = [];
+//         if (snapshot.val() && snapshot.val()["users"]) {
+//             jQuery.each(snapshot.val()["users"], function(username, value) {
+//                 registeredUserNameArray.push(username);
+//             });
+//             console.log("registeredUserNameArray: " + registeredUserNameArray);
+//         }
+//     });
+// }
+
+function updateRegisteredUserNameArray() {
+    database.ref().on("value", function(snapshot) {
+        console.log("inside updateRegisteredUserNameArray()");
+        registeredUserNameArray = [];
+        if (snapshot.val() && snapshot.val()["users"]) {
+            jQuery.each(snapshot.val()["users"], function(username, value) {
+                registeredUserNameArray.push(username);
+            });
+            console.log("registeredUserNameArray: " + registeredUserNameArray);
+        }
+    });
+}
+
+function registerUsername(username) {
+    database.ref().child("users/" + username).set("Registered the username " + username);
+}
+
+function displayFeedback(message) {
+    if (message) {
+        $("#feedback-div").text(message);
+    } else {
+        $("#feedback-div").text("");
+    }
+}
+function deleteDatabaseInfo() {
+    $("#clear-database-button").on("click", function() {
+        // database.ref().child("users").remove();
+        database.ref().remove();
+    });
+}
+
 function clock() {
     setInterval(function(){
         $("#clock").text(moment().format("dddd MMMM Do YYYY h:mm:ss A")); 
-        }, 
-    1000);
+    }, 1 * 1000);
 }
 
 function clickWidgetButtonListener() {

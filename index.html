@@ -49,7 +49,18 @@
 			</div>
 
 			<div class="row" id="google-search-bar">
-				<div class="col-md-8 offset-md-2 offset-md-right-2">
+				<div class="col-md-4">
+					<form>
+					  <div class="form-group">
+					    <input type="text" class="form-control" id="username" placeholder="joesmith123">
+					  </div>
+					  <button id="authenticate-button" type="submit" class="btn btn-success m-1">Authenticate</button>
+					  <button id="register-button" type="submit" class="btn btn-primary m-1">Register</button>
+					  <button id="save-button" type="submit" class="btn btn-warning m-1">Save Widget State</button>
+					</form>
+					<div id="feedback-div">hello</div>
+				</div>
+				<div class="col-md-8">
 					<script>
 		    			(function() {
 						    var cx = '006268431623756602253:kj8bj1_hsoq';
@@ -67,7 +78,8 @@
 			
 			<div class="row">
 				<div class="col-md-6 offset-md-3 offset-md-right-3 mt-3 mb-3">
-					<div id="clear-localstorage-button" class="btn btn-primary">Clear Local Storage</div>
+					<div id="clear-localstorage-button" class="btn btn-danger">Clear Local Storage</div>
+					<div id="clear-database-button" class="btn btn-danger">Clear Firebase</div>
 				</div>
 			</div>
 
