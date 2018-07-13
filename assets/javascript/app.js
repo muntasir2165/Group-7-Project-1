@@ -8,6 +8,7 @@ $(document).ready(function() {
     generateWidgetFromLocalStorage();
     clickWidgetListener();
     searchCityWeatherEventListner();
+    reStartClickedEventListner();
     clock();
     $(document).on("click", "#YTbutton",function() {
         event.preventDefault();
@@ -51,6 +52,12 @@ function generateAndDisplayWidget(widgetName, addWidgetToLocalStorage) {
     switch(widgetName) {
         case "weather":
             weatherWidget();
+            if (addWidgetToLocalStorage) {
+                updateWidgetInfoToLocalStorage("add", widgetName);
+            }
+            break;
+            case "trivia":
+            triviaWidget();
             if (addWidgetToLocalStorage) {
                 updateWidgetInfoToLocalStorage("add", widgetName);
             }
@@ -373,6 +380,207 @@ function searchCityWeatherEventListner() {
         weatherWidget(city);
   });
 }
+// Trivia Widget
+
+
+function triviaWidget() {
+    getData("https://opentdb.com/api.php?amount=10", generateTriviaHTML, displayTriviaWidget);
+}
+var question_number = 0;
+var triviaArray = [];
+var correctAnswers = 0;
+var inCorrectAnswers = 0;
+
+function generateTriviaHTML(response) {
+    triviaArray = response;
+    var mainDiv = createHtmlTags("div", "class", "row", "");
+    var colDiv = createHtmlTags("div", "class", "col-md-3", "");
+    mainDiv.append(colDiv);
+
+    var card = $("<div>");
+    card.addClass("card border-primary mb-3");
+    card.attr("style", "max-width: 15rem");
+
+    var cardHeader = $("<div>");
+    cardHeader.addClass("card-header");
+    cardHeader.text("Trivia Game");
+
+    var cardBody = $("<div>");
+    cardBody.addClass("card-body text-primary weather-row");
+
+    var gameDiv = $("<div>");
+    gameDiv.attr("id", "gameDiv")
+    gameDiv.show();
+
+    var showAnswerDiv = $("<div>");
+    showAnswerDiv.attr("id", "showAnswer")
+    showAnswerDiv.hide();
+
+    var resultDiv = $("<div>");
+    resultDiv.attr("id", "resultDiv")
+    resultDiv.hide();
+
+    cardBody.append(gameDiv);
+    cardBody.append(showAnswerDiv);
+    cardBody.append(resultDiv);
+
+    card.append(cardHeader);
+    card.append(cardBody);
+
+    return card;
+}
+
+//Load next quiz called at START START OVER and get next quiz
+function loadNextQuiz() {
+    var answerMath = [1, 2, 3, 4];
+    var optH2 = [];
+    var qDiv = document.getElementById("gameDiv");
+    var qQuestion = triviaArray.results[question_number].question;
+    var qH2 = createHtmlTags("h2", "class", "questions", qQuestion);
+
+    var qOptions = [];
+    qCorrectAnswer = triviaArray.results[question_number].correct_answer;
+    qOptions = triviaArray.results[question_number].incorrect_answers;
+    var pos = qOptions.indexOf(qCorrectAnswer);
+    if (pos === -1) {
+        console.log("pos :" + pos);
+        answerPos = answerMath[Math.floor(Math.random() * answerMath.length)];
+        qOptions.splice(answerPos, 0, qCorrectAnswer);
+    }
+    $("#gameDiv").empty();
+    qDiv.append(qH2);
+    for (var j = 0; j < qOptions.length; j++) {
+        optH2[j] = document.createElement("h2");
+        optH2[j].setAttribute("class", "answers");
+        optH2[j].setAttribute("onclick", "optionsClicked(this)");
+        optH2[j].setAttribute("onmouseover", "mOver(this)");
+        optH2[j].setAttribute("onmouseout", "mOut(this)");
+        optH2[j].innerHTML = qOptions[j];
+        qDiv.append(optH2[j]);
+    }
+    question_number += 1;
+}
+
+// Called from OPTIONS selected by user
+function optionsClicked(obj) {
+    answerClicked = "true";
+    var answerWrong = "Nope!!";
+    var answerRight = "Correct!!";
+    var answerCorrect = "Correct Answer Is: ";
+    var answerSelected = obj.innerHTML;
+    var aCommentH2 = document.createElement("h2");
+    aCommentH2.setAttribute("id", "comment");
+    aCommentH2.innerHTML = answerWrong;
+    var aCorrectAnswerH2 = document.createElement("h2");
+    aCorrectAnswerH2.setAttribute("id", "correctAnswerComment");
+    var qCorrectAns = "";
+
+    qCorrectAns = triviaArray.results[question_number - 1].correct_answer;
+    aCorrectAnswerH2.innerHTML = answerCorrect + " " + qCorrectAns + "!!";
+
+    if (answerSelected === qCorrectAns) {
+        correctAnswers += 1;
+        aCommentH2.innerHTML = answerRight;
+    } else {
+        inCorrectAnswers += 1;
+    }
+    document.getElementById("gameDiv").style.display = "none";
+    document.getElementById("showAnswer").style.display = "block";
+    loadAnswerDiv(aCommentH2, aCorrectAnswerH2);
+};
+
+function getNextQuiz() {
+    document.getElementById("showAnswer").style.display = "none";
+    if (question_number < triviaArray.results.length) {
+        loadNextQuiz();
+        document.getElementById("gameDiv").style.display = "block";
+    }
+    else {
+        loadResultDiv();
+    }
+}
+
+//Called from optionsClicked
+function loadAnswerDiv(aCommentH2, aCorrectAnswerH2) {
+    var aDiv = document.getElementById("showAnswer");
+    var aNextButton = document.createElement("button");
+    aNextButton.setAttribute("id", "nextQuiz");
+    aNextButton.setAttribute("onclick", "getNextQuiz()");
+    aNextButton.innerHTML = "Click Next";
+
+    $("#showAnswer").empty();
+    aDiv.append(aCommentH2);
+    aDiv.append(aCorrectAnswerH2);
+    aDiv.append(aNextButton);
+}
+
+//Called from get Next Quiz, if all questions are answered
+function loadResultDiv() {
+    var rcorrctAnsSpan = createHtmlTags("span", "id", "correctAnswer", "");
+    var rincorrctAnsSpan = createHtmlTags("span", "id", "inCorrectAnswer", "");
+
+    var rcorrectAnsP = createHtmlTags("p", "class", "answerP", "Correct Answer: ");
+    rcorrectAnsP.append(rcorrctAnsSpan);
+
+    var rincorrectAnsP = createHtmlTags("p", "class", "answerP", "InCorrect Answer: ");
+    rincorrectAnsP.append(rincorrctAnsSpan);
+
+    var rstartOverButton = createHtmlTags("button", "id", "reStartGame", "START OVER");
+    var rStartOverDiv = createHtmlTags("div", "id", "startOver", inCorrectAnswers);
+    rStartOverDiv.append(rstartOverButton);
+    rcorrctAnsSpan.innerHTML = correctAnswers;
+    rincorrctAnsSpan.innerHTML = inCorrectAnswers;
+
+    document.getElementById("resultDiv").style.display = "block";
+    answerClicked = "true";
+
+    var rDiv = document.getElementById("resultDiv");
+    var rH2 = document.createElement("h2");
+    rH2.setAttribute("class", "allDone");
+    rH2.innerHTML = "All Done!!";
+    $("#resultDiv").empty();
+    rDiv.append(rH2);
+    rDiv.append(rcorrectAnsP);
+    rDiv.append(rincorrectAnsP);
+
+    rDiv.append(rStartOverDiv);
+}
+
+function createHtmlTags(elemnt, attributeType, attributeValue, innerHtmlVal) {
+    var newHtmlTag = document.createElement(elemnt);
+    newHtmlTag.setAttribute(attributeType, attributeValue);
+    console.log("innerHtmlVal :" + innerHtmlVal.length);
+    if (innerHtmlVal.length > 0) {
+        newHtmlTag.innerHTML = innerHtmlVal;
+    }
+    return newHtmlTag;
+}
+
+function reStartClickedEventListner() {
+    $("body").on("click", "#reStartGame", function () {
+        correctAnswers = 0;
+        inCorrectAnswers = 0;
+        question_number = 0;
+        document.getElementById("resultDiv").style.display = "none";
+        document.getElementById("gameDiv").style.display = "block";
+        triviaWidget();
+    });
+}
+
+function mOver(obj) {
+    obj.style.backgroundColor = "#1ec5e5";
+}
+//Attachd to options
+function mOut(obj) {
+    obj.style.backgroundColor = "#ffffff";
+}
+
+function displayTriviaWidget(triviaWidgetHtml) {
+    $("#trivia").html(triviaWidgetHtml);
+    loadNextQuiz();
+}
+
+// Trivia Widget ends
 
 function getData(queryUrl, generateWidgetHtml, displayWidget) {
     console.log(queryUrl);
