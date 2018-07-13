@@ -93,7 +93,7 @@ function clickWidgetListener() {
 function clearLocalStorageButtonListener() {
     $("#clear-localstorage-button").on("click", function() {
         localStorage.clear();
-        console.log("Cleared Local Storage");
+        location.reload();
     });
 }
 
