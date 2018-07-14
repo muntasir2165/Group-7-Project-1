@@ -127,6 +127,7 @@ table.gsc-search-box {
 
 #trivia {
     padding: 7px;
+    overflow: overlay;
 }
 
 #trivia #trivia_header{
@@ -169,9 +170,10 @@ table.gsc-search-box {
 }
 
 #weather .weather-row{
-    display: flex;
-    flex-direction: row;
+    /* display: flex;
+    flex-direction: row; */
     margin-top: 12px;
+    margin-bottom: 12px;
 }
 
 
@@ -179,6 +181,7 @@ table.gsc-search-box {
     display: flex;
     flex-direction: column;
     margin-left: 0px;
+    padding: 7px;
 }
 
 #weather img{
@@ -189,6 +192,16 @@ table.gsc-search-box {
 
 #weather p{
     margin-bottom: 0px;
+}
+
+#search {
+    margin-top: 12px;
+    background-color: lightgray;
+}
+
+#search-weather {
+    width: 90%;
+    margin-right: 10px;
 }
 /* Weather widget sytling ends */
 
