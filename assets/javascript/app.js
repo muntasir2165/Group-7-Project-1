@@ -356,7 +356,7 @@ function youTubeWidget() {
     $("#YTform").append(youTubeSearch);
     $("#YTform").append(youTubeButton);
 
-  };
+  }
 
   
 function youTubeCreation() {
@@ -390,20 +390,20 @@ function generateYouTubeWidgetHtml(response) {
 
 function displayYouTubeWidget(youtubeWidgetHtml) {
     $("#youtube").append(youtubeWidgetHtml);
-};
+}
 
 function gifListener() {
     $(document).on("click", "#gif",function() {
         event.preventDefault();
         gifWidget();
-    });
-}; 
+    })
+}
 
 function gifWidget() {
     var apikey = "AGOnLXwDOWiIu3oC7OMWNFsQCMAElFt4"
     var queryUrl = "http://api.giphy.com/v1/gifs/random?api_key=" + apikey+ "&limit=1";
     getData(queryUrl, generateGifWidgetHtml, displayGifWidget); 
-};
+}
 
 function generateGifWidgetHtml(response) {
     $("#gif").empty(); 
