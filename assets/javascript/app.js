@@ -183,7 +183,7 @@ function deleteDatabaseInfo() {
 
 function clock() {
     setInterval(function(){
-        $("#clock").text(moment().format("dddd MMMM Do YYYY h:mm:ss A")); 
+        $("#clock").text(moment().format("dddd, MMMM Do, YYYY h:mm:ss A")); 
     }, 1 * 1000);
 }
 
@@ -243,6 +243,9 @@ function generateAndDisplayWidget(widgetName, addWidgetToLocalStorage) {
             if (addWidgetToLocalStorage) {
                 updateWidgetInfoToLocalStorage("add", widgetName);
             }
+            break;
+        case "google-maps":
+            console.log("google-maps");
             break; 
         default:
             console.log("The " + widgetName+ " widget cannot be displayed on the dashboad at the moment");
