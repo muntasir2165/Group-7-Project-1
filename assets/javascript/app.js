@@ -477,6 +477,7 @@ function generateNewsWidgetHtml(response) {
         var titleDiv = $("<p>").text(title);
         var url = results[i].url;
         var urlDiv = $("<p>").append("<a href='" + url + "'target='_blank'>Read More</a>");
+        urlDiv.addClass("readMoreBtn");
         var br = $("<br>");
         $("#newsResults").append(br);
         $("#newsResults").append(titleDiv);
@@ -493,7 +494,6 @@ function YTbuttonClickListener() {
 
 function youTubeWidget() {
 
-    var br = $("<br><br>");
     var breaker = $("<br><br>");
     var form = $("<form>").attr("id", "YTform");
     var youTubeSearch = $("<input>").attr("type", "text");
@@ -511,7 +511,7 @@ function youTubeWidget() {
     $("#videoRow").append(videoSubContainer);
     $("#videoColumn").append(form);
     $("#videoColumn").append(breaker, allVideosDiv);
-    $("#YTform").append(youTubeSearch, br);
+    $("#YTform").append(youTubeSearch);
     $("#YTform").append(youTubeButton);
 
   };
@@ -531,15 +531,17 @@ function generateYouTubeWidgetHtml(response) {
         console.log(response);
         var videoID = response.items[i].id.videoId;
         var imgDiv = $("<div>").addClass("thumbnails"); 
-        var br = $("<br>")
+        var br = $("<br>");
+        var breaker = $("<br>");
         imgDiv.html("<img src=" + response.items[i].snippet.thumbnails.default.url + ">");
         $("#allVideos").append(imgDiv, br);
 
         var titleID = response.items[i].snippet.title.substring(0,60); 
 
         var videoLink = $("<p>").append("<a href='" + "https://www.youtube.com/watch?v=" + videoID+ "'target='_blank'>" + titleID + "</a>");
-  
-        $("#allVideos").append(videoLink);
+        videoLink.addClass("YTlink");
+
+        $("#allVideos").append(videoLink, breaker);
 
     }
 }   
