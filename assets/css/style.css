@@ -8,6 +8,8 @@
 body {
 	background-color: #464646;
     color: #000000;
+    background-image: url("../images/background2.jpg");
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
 }
 
 .container {
@@ -15,7 +17,7 @@ body {
 }
 
 #clock {
-    font-size: 12px;
+    font-size: 14px;
     color: #ffffff;
 }
 .row {
@@ -27,7 +29,8 @@ body {
     max-height: 96px;
     max-width: 96px;
     padding: 0px;
-    background-color: #464646;
+    background-color: rgba(139,187,171,0.5);
+    border-radius: 9px;
 }
 
 img.widget-image {
@@ -35,8 +38,55 @@ img.widget-image {
     max-height: 96px;
 }
 
+#weatherImg {
+    position: relative;
+    right: 4px;
+    top: 2px;
+}
+
+#newsImg {
+    width: 100%;
+    top: 1px;
+    position: relative;
+}
+
+#gifImg {
+    border-radius: 9px;
+}
+
+#coinImage {
+    width: 100%;
+}
+
+#tubeImage {
+    width: 97%;
+    margin-top: 0.5%;
+    margin-right: 1%;
+}
+
+#triviaImg {
+    width: 100%;
+}
+
 #google-search-bar {
     margin: 8px;
+
+}
+
+table.gsc-search-box {
+    position: relative;
+    top: 2px;
+}
+
+.cse .gsc-control-cse, .gsc-control-cse {
+    border-radius: 9px;
+}
+
+#clear-localstorage-button{
+    color: #fff;
+    background-color: lightseagreen;
+    border-color: lightseagreen;
+    border-radius: 9px;
 }
 
 .draggable, .resize-drag {
@@ -44,13 +94,17 @@ img.widget-image {
     max-width: 64px;*/
     /*height: 64px;*/
     width: 240px;
-    background-color: #ffffff;
+    background-color:rgba(255,255,255,0.8);
+    border-radius: 10px;
+    position: absolute;
+
 }
 
 #dashboard {
     min-height: 640px;
     min-width: 480px;
-    background-color: #a4a4a4;
+    background-color: rgba(139,187,171,0.5);
+    border-radius: 10px;
 }
 
 /*input {
@@ -64,9 +118,16 @@ img.widget-image {
 
 #trivia .questions, .answers, #showAnswer, #comment, #correctAnswerComment, #nextQuiz,.allDone,.answerP{
     text-align: center;
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 15px;
+    /* font-family: 'Times New Roman', Times, serif; */
+    /* font-size: 15px; */
     color: black;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+#trivia {
+    padding: 7px;
+    overflow: overlay;
 }
 
 #trivia #trivia_header{
@@ -79,7 +140,7 @@ img.widget-image {
    margin-top: 10px;
    margin-bottom: 10px;
    left: 40px;
-   font-size: 10px;
+   /* font-size: 10px; */
    color: black;
    background-color: white
 }
@@ -90,7 +151,7 @@ img.widget-image {
     margin-top: 10px;
     margin-bottom: 10px;
    left: 40px;
-   font-size: 10px;
+   /* font-size: 10px; */
    color: black;
    background-color: white;
 }
@@ -101,6 +162,7 @@ img.widget-image {
 #weather {
     max-width: 240px;
     max-height: 160px;
+    border-radius: 25px;
 }
 
 #weather .card-body{
@@ -108,8 +170,10 @@ img.widget-image {
 }
 
 #weather .weather-row{
-    display: flex;
-    flex-direction: row;
+    /* display: flex;
+    flex-direction: row; */
+    margin-top: 12px;
+    margin-bottom: 12px;
 }
 
 
@@ -117,6 +181,7 @@ img.widget-image {
     display: flex;
     flex-direction: column;
     margin-left: 0px;
+    padding: 7px;
 }
 
 #weather img{
@@ -128,4 +193,55 @@ img.widget-image {
 #weather p{
     margin-bottom: 0px;
 }
+
+#search {
+    margin-top: 12px;
+    background-color: lightgray;
+}
+
+#search-weather {
+    width: 90%;
+    margin-right: 10px;
+}
 /* Weather widget sytling ends */
+
+#news {
+    overflow: scroll;
+    padding: 7px;
+}
+
+#newsColumn {
+    margin-top: 12px;
+}
+
+.readMoreBtn:hover {
+    /* background-color: #c7c7c7; */
+    background-color: lightblue;
+}
+
+#bitcoin {
+    overflow: scroll;
+    padding: 7px;
+}
+
+#bitcoinResults {
+   margin-left: 30px;
+   margin-top: 12px;
+}
+
+#youtube {
+    overflow: scroll;
+    padding: 7px;
+}
+
+.YTlink:hover {
+    background-color:lightblue;
+}
+
+#YTform {
+    margin-top: 12px;
+}
+
+#youTubeInput {
+    margin-bottom: 12px;
+}
