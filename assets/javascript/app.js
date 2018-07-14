@@ -4,6 +4,7 @@ var registeredUserWidgetInfoObject ={};
 var authenticatedUsername = "";
 
 $(document).ready(function() {
+    emptyLocalStorageForUnAuthenticatedUser();
     // a variable to reference the database
     database = initializeFirebase();
     deleteDatabaseInfo();
@@ -26,6 +27,12 @@ $(document).ready(function() {
     clock();
     YTbuttonClickListener(); 
 });
+
+function emptyLocalStorageForUnAuthenticatedUser() {
+    if (!authenticatedUsername) {
+        localStorage.clear();
+    }
+}
 
 function initializeFirebase() {
     var config = {

@@ -20,6 +20,11 @@ body {
     font-size: 14px;
     color: #ffffff;
 }
+
+#feedback-div {
+    color: #ffffff;
+}
+
 .row {
    margin-left: 0;
    margin-right: 0;
