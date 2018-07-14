@@ -26,6 +26,7 @@ $(document).ready(function() {
     reStartClickedEventListner();
     clock();
     YTbuttonClickListener(); 
+    gifListener(); 
 });
 
 function emptyLocalStorageForUnAuthenticatedUser() {
@@ -246,6 +247,12 @@ function generateAndDisplayWidget(widgetName, addWidgetToLocalStorage) {
             break;
         case "google-maps":
             console.log("google-maps");
+            break; 
+        case "gif": 
+            gifWidget(); 
+            if (addWidgetToLocalStorage) {
+                updateWidgetInfoToLocalStorage("add", widgetName); 
+            }
             break; 
         default:
             console.log("The " + widgetName+ " widget cannot be displayed on the dashboad at the moment");
@@ -524,7 +531,7 @@ function youTubeWidget() {
     $("#YTform").append(youTubeSearch);
     $("#YTform").append(youTubeButton);
 
-  };
+  }
 
   
 function youTubeCreation() {
@@ -559,6 +566,38 @@ function generateYouTubeWidgetHtml(response) {
 function displayYouTubeWidget(youtubeWidgetHtml) {
     $("#youtube").append(youtubeWidgetHtml);
 }
+
+function gifListener() {
+    $(document).on("click", "#gif",function() {
+        event.preventDefault();
+        gifWidget();
+    })
+}
+
+function gifWidget() {
+    var apikey = "AGOnLXwDOWiIu3oC7OMWNFsQCMAElFt4"
+    var queryUrl = "http://api.giphy.com/v1/gifs/random?api_key=" + apikey+ "&limit=1";
+    getData(queryUrl, generateGifWidgetHtml, displayGifWidget); 
+}
+
+function generateGifWidgetHtml(response) {
+    $("#gif").empty(); 
+    var gifContainer = $("<div>").addClass("row");
+    var gifSubContainer = $("<div>").addClass("col-xs-12");
+
+    var theGif = $("<img>").addClass("the-gif");
+    theGif.attr("src", response.data.images.fixed_width.url);
+
+    gifSubContainer.html(theGif);
+    gifContainer.append(gifSubContainer);
+    $("#gif").append(gifContainer);
+
+}
+
+function displayGifWidget(gifWidgetHtml) {
+    $("#gif").append(gifWidgetHtml);
+}
+
 
 function triviaWidget() {
     getData("https://opentdb.com/api.php?amount=10", generateTriviaHTML, displayTriviaWidget);
