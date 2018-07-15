@@ -1,10 +1,10 @@
 var database = null;
-var registeredUserNameArray =[];
-var registeredUserWidgetInfoObject ={};
+var registeredUserNameArray = [];
+var registeredUserWidgetInfoObject = {};
 var authenticatedUsername = "";
 var toDoArray = [];
 
-$(document).ready(function() {
+$(document).ready(function () {
     emptyLocalStorageForUnAuthenticatedUser();
     // a variable to reference the database
     database = initializeFirebase();
@@ -14,7 +14,7 @@ $(document).ready(function() {
     registerButtonClickListener();
     // getUserNameListing();
     updateRegisteredUserNameArray();
-    
+
     clickWidgetButtonListener();
     clearLocalStorageButtonListener(); //for local storage debugging only
     // draggableDivListener();
@@ -24,12 +24,15 @@ $(document).ready(function() {
     generateWidgetFromLocalStorage();
     clickWidgetListener();
     searchCityWeatherEventListner();
+    searchMovieEventistner();
+    searchTriviaEventistner();
     reStartClickedEventListner();
     clock();
-    YTbuttonClickListener(); 
-    gifListener(); 
+    YTbuttonClickListener();
+    gifListener();
     addToDoBtnClickListener();
     taskBtnClassClickListener();
+
 });
 
 function emptyLocalStorageForUnAuthenticatedUser() {
@@ -52,7 +55,7 @@ function initializeFirebase() {
 }
 
 function saveWidgetStateButtonClickListener() {
-    $("#save-widget-state-button").on("click", function() {
+    $("#save-widget-state-button").on("click", function () {
         event.preventDefault();
         if (!authenticatedUsername) {
             displayFeedback("You have not registered and/or authenticated yet");
@@ -61,7 +64,7 @@ function saveWidgetStateButtonClickListener() {
             displayFeedback("Saved widget information");
             setTimeout(displayFeedback, 10 * 1000);
         }
-    });   
+    });
 }
 
 function saveUserWidgetInfoToDatabase(username) {
@@ -69,7 +72,7 @@ function saveUserWidgetInfoToDatabase(username) {
 }
 
 function authenticateButtonClickListener() {
-    $("#authenticate-button").on("click", function() {
+    $("#authenticate-button").on("click", function () {
         event.preventDefault();
         var username = $("#username").val();
         if (!isUsernameValid(username)) {
@@ -89,11 +92,11 @@ function authenticateButtonClickListener() {
         }
         $("#username").val("");
         // database.ref().child("users").remove();
-    });   
+    });
 }
 
 function registerButtonClickListener() {
-    $("#register-button").on("click", function() {
+    $("#register-button").on("click", function () {
         event.preventDefault();
         var username = $("#username").val();
         if (!isUsernameValid(username)) {
@@ -109,7 +112,7 @@ function registerButtonClickListener() {
         }
         $("#username").val("");
         // database.ref().child("users").remove();
-    });   
+    });
 }
 
 function isUsernameValid(username) {
@@ -118,7 +121,7 @@ function isUsernameValid(username) {
     }
 
     var invalidCharacterArray = [".", "#", "$", "[", "]"];
-    for (var i=0; i<invalidCharacterArray.length; i++) {
+    for (var i = 0; i < invalidCharacterArray.length; i++) {
         var invalidCharacter = invalidCharacterArray[i];
         if (username.indexOf(invalidCharacter) !== -1) {
             return false;
@@ -129,7 +132,7 @@ function isUsernameValid(username) {
 }
 
 function isUsernameUnique(username) {
-    for (var i=0; i<registeredUserNameArray.length; i++) {
+    for (var i = 0; i < registeredUserNameArray.length; i++) {
         var currentUsername = registeredUserNameArray[i];
         if (username === currentUsername) {
             return false;
@@ -153,11 +156,11 @@ function isUsernameUnique(username) {
 // }
 
 function updateRegisteredUserNameArray() {
-    database.ref().on("value", function(snapshot) {
+    database.ref().on("value", function (snapshot) {
         console.log("inside updateRegisteredUserNameArray()");
         registeredUserNameArray = [];
         if (snapshot.val() && snapshot.val()["users"]) {
-            jQuery.each(snapshot.val()["users"], function(username, value) {
+            jQuery.each(snapshot.val()["users"], function (username, value) {
                 registeredUserNameArray.push(username);
                 registeredUserWidgetInfoObject[username] = value;
             });
@@ -179,24 +182,24 @@ function displayFeedback(message) {
     }
 }
 function deleteDatabaseInfo() {
-    $("#clear-database-button").on("click", function() {
+    $("#clear-database-button").on("click", function () {
         // database.ref().child("users").remove();
         database.ref().remove();
     });
 }
 
 function clock() {
-    setInterval(function(){
-        $("#clock").text(moment().format("dddd, MMMM Do, YYYY h:mm:ss A")); 
+    setInterval(function () {
+        $("#clock").text(moment().format("dddd, MMMM Do, YYYY h:mm:ss A"));
     }, 1 * 1000);
 }
 
 function clickWidgetButtonListener() {
-    $(document).on("click", ".widget-btn", function() {
+    $(document).on("click", ".widget-btn", function () {
         var widgetName = $(this).attr("data-widget");
-        if ($("#" + widgetName).length !== 0){
+        if ($("#" + widgetName).length !== 0) {
             $("#" + widgetName).remove();
-            console.log("The " + widgetName+ " has been removed from the screen");
+            console.log("The " + widgetName + " has been removed from the screen");
             updateWidgetInfoToLocalStorage("remove", widgetName);
         } else {
             generateAndDisplayWidgetContainer(widgetName);
@@ -217,15 +220,21 @@ function generateAndDisplayWidgetContainer(widgetName) {
 }
 
 function generateAndDisplayWidget(widgetName, addWidgetToLocalStorage) {
-    switch(widgetName) {
+    switch (widgetName) {
         case "weather":
             weatherWidget();
             if (addWidgetToLocalStorage) {
                 updateWidgetInfoToLocalStorage("add", widgetName);
             }
             break;
-            case "trivia":
+        case "trivia":
             triviaWidget();
+            if (addWidgetToLocalStorage) {
+                updateWidgetInfoToLocalStorage("add", widgetName);
+            }
+            break;
+        case "movie":
+            movieWidget();
             if (addWidgetToLocalStorage) {
                 updateWidgetInfoToLocalStorage("add", widgetName);
             }
@@ -243,30 +252,30 @@ function generateAndDisplayWidget(widgetName, addWidgetToLocalStorage) {
             }
             break;
         case "youtube":
-            youTubeWidget(); 
+            youTubeWidget();
             if (addWidgetToLocalStorage) {
                 updateWidgetInfoToLocalStorage("add", widgetName);
             }
             break;
         case "google-maps":
             console.log("google-maps");
-            break; 
-        case "gif": 
-            gifWidget(); 
+            break;
+        case "gif":
+            gifWidget();
             if (addWidgetToLocalStorage) {
-                updateWidgetInfoToLocalStorage("add", widgetName); 
+                updateWidgetInfoToLocalStorage("add", widgetName);
             }
-            break; 
+            break;
         case "toDoList":
             createToDoInput();
             break;
         default:
-            console.log("The " + widgetName+ " widget cannot be displayed on the dashboad at the moment");
+            console.log("The " + widgetName + " widget cannot be displayed on the dashboad at the moment");
     }
 }
 
 function clickWidgetListener() {
-    $(document).on("click", ".resize-drag", function() {
+    $(document).on("click", ".resize-drag", function () {
         var widgetName = $(this).attr("id");
         console.log("clickWidgetListener() for widget: " + widgetName);
         updateWidgetInfoToLocalStorage("add", widgetName);
@@ -274,7 +283,7 @@ function clickWidgetListener() {
 }
 
 function clearLocalStorageButtonListener() {
-    $("#clear-localstorage-button").on("click", function() {
+    $("#clear-localstorage-button").on("click", function () {
         localStorage.clear();
         location.reload();
     });
@@ -311,7 +320,7 @@ function updateWidgetInfoToLocalStorage(update, widgetName) {
 
 function generateWidgetFromLocalStorage() {
     var widgetInfoObject = getWidgetInfoFromLocalStorage();
-    $.each(widgetInfoObject, function(widgetName, widgetInfo){
+    $.each(widgetInfoObject, function (widgetName, widgetInfo) {
         generateAndDisplayWidgetContainer(widgetName);
         var addWidgetToLocalStorage = false; //false because the widget already exists in local storage
         generateAndDisplayWidget(widgetName, addWidgetToLocalStorage);
@@ -320,7 +329,7 @@ function generateWidgetFromLocalStorage() {
 }
 
 function updateWidgetHtmlAttributes(widgetName, widgetInfo) {
-    $.each(widgetInfo, function(attribute, value){
+    $.each(widgetInfo, function (attribute, value) {
         $("#" + widgetName).attr(attribute, value);
     });
 }
@@ -433,7 +442,7 @@ function bitcoinWidget() {
     $("#bitcoinRow").append($("<div>").attr("id", "bitcoinColumn"));
     $("#bitcoinColumn").addClass("col-xs-12");
     $("#bitcoinColumn").append($("<div>").attr("id", "bitcoinResults"));
-    
+
     // API Key for World Coin Index API
     var apikey = "O9zZJm0q0o0XnTTXUWGbkqI5sXdeON&label=ethbtc-ltcbtc&fiat=btc";
     var queryUrl = "https://www.worldcoinindex.com/apiservice/ticker?key=" + apikey;
@@ -477,61 +486,60 @@ function weatherWidget(city) {
 }
 
 function generateWeatherWidgetHtml(response) {
-   
-    var tempInfern  = (response.main.temp - 273.15) *1.80+32;
-    var tempInCenti = (tempInfern -32)*5/9;
-    console.log("tempInCenti :"+tempInCenti);
-    var paresedtemp =  Math.round(tempInfern);
-    var paresedCentiTemp =  Math.round(tempInCenti);
-    var city= response.name;
+
+    var tempInfern = (response.main.temp - 273.15) * 1.80 + 32;
+    var tempInCenti = (tempInfern - 32) * 5 / 9;
+    var paresedtemp = Math.round(tempInfern);
+    var paresedCentiTemp = Math.round(tempInCenti);
+    var city = response.name;
     var humidity = response.main.humidity;
-    var wind=response.wind.speed;
+    var wind = response.wind.speed;
     var weather_icon = response.weather[0].icon;
     var weather_desc = response.weather[0].description;
-    var weather_pressure = response.main.pressure+" hPa";
-    var city=response.name;
-   
+    var weather_pressure = response.main.pressure + " hPa";
+    var city = response.name;
+
     var card = $("<div>");
     card.addClass("card border-success xs-3");
     card.attr("style", "max-width: 18rem");
-    
+
     var cardHeader = $("<div>");
     cardHeader.addClass("card-header");
-   
-    cardHeader.text("Weather for "+city+" , ON");
+
+    cardHeader.text("Weather for " + city);
     var cardBody = $("<div>");
     cardBody.addClass("card-body text-primary weather-row");
 
     var icon_url = "http://openweathermap.org/img/w/";
-    var newicon = icon_url+weather_icon+".png";
-    cardBody.append("<div class=\"weather_icon\">"+ "<img src=\"" + newicon + "\"></div>");
+    var newicon = icon_url + weather_icon + ".png";
+    cardBody.append("<div class=\"weather_icon\">" + "<img src=\"" + newicon + "\"></div>");
 
     var cardBodyWeatherInfoDiv = $("<div>");
     cardBodyWeatherInfoDiv.addClass("weather-col");
-    cardBodyWeatherInfoDiv.append($("<p>").addClass("temp").text(paresedtemp+"°F "+"  "+paresedCentiTemp +"°C"));
+    cardBodyWeatherInfoDiv.append($("<p>").addClass("temp").text(paresedtemp + "°F " + "  " + paresedCentiTemp + "°C"));
     cardBodyWeatherInfoDiv.append($("<p>").addClass("desc").text(weather_desc));
-    cardBodyWeatherInfoDiv.append($("<p>").addClass("wind").text("wind :"+wind));
-    cardBodyWeatherInfoDiv.append($("<p>").addClass("humidity").text("humidity :"+humidity));
-    cardBodyWeatherInfoDiv.append($("<p>").addClass("pressure").text("Pressure :"+weather_pressure));
+    cardBodyWeatherInfoDiv.append($("<p>").addClass("wind").text("wind :" + wind));
+    cardBodyWeatherInfoDiv.append($("<p>").addClass("humidity").text("humidity :" + humidity));
+    cardBodyWeatherInfoDiv.append($("<p>").addClass("pressure").text("Pressure :" + weather_pressure));
     cardBody.append(cardBodyWeatherInfoDiv);
 
     var cardFooter = $("<div>");
     cardFooter.addClass("card-footer bg-transparent border-success");
-    var cityInput=$("<input>");
-    cityInput.attr("id","search-weather");
-    cityInput.attr("type","text");
-    cityInput.attr(palceholder="Venice");
-    cityInput.attr("value","");
+    var cityInput = $("<input>");
+    cityInput.attr("id", "search-weather");
+    cityInput.attr("type", "text");
+    cityInput.attr(palceholder = "Venice");
+    cityInput.attr("value", "");
 
-    var citySubmitButton  = $("<button>");
+    var citySubmitButton = $("<button>");
     citySubmitButton.addClass("btn btn-default")
-    citySubmitButton.attr("id","search");
-    citySubmitButton.attr("type","submit");
-    citySubmitButton.text("Submit");
-    
+    citySubmitButton.attr("id", "search");
+    citySubmitButton.attr("type", "submit");
+    citySubmitButton.text("Search City");
+
     cardFooter.append(cityInput);
     cardFooter.append(citySubmitButton);
-    
+
     card.append(cardHeader);
     card.append(cardBody);
     card.append(cardFooter);
@@ -548,7 +556,7 @@ function searchCityWeatherEventListner() {
     $("body").on("click", "#search", function () {
         var city = $("#search-weather").val();
         weatherWidget(city);
-  });
+    });
 }
 
 function generateNewsWidgetHtml(response) {
@@ -570,7 +578,7 @@ function generateNewsWidgetHtml(response) {
 }
 
 function YTbuttonClickListener() {
-    $(document).on("click", "#YTbutton",function() {
+    $(document).on("click", "#YTbutton", function () {
         event.preventDefault();
         youTubeCreation();
     });
@@ -584,11 +592,11 @@ function youTubeWidget() {
     youTubeSearch.attr("id", "youTubeInput");
     var youTubeButton = $("<input>").attr("type", "submit");
     youTubeButton.attr("id", "YTbutton");
-    youTubeButton.attr("value", "Search YouTube!"); 
+    youTubeButton.attr("value", "Search YouTube!");
 
-    var videoContainer = $("<div>").addClass("row"); 
+    var videoContainer = $("<div>").addClass("row");
     videoContainer.attr("id", "videoRow");
-    var videoSubContainer = $("<div>").addClass("col-xs-12"); 
+    var videoSubContainer = $("<div>").addClass("col-xs-12");
     videoSubContainer.attr("id", "videoColumn");
     var allVideosDiv = $("<div>").attr("id", "allVideos");
     $("#youtube").append(videoContainer);
@@ -598,9 +606,9 @@ function youTubeWidget() {
     $("#YTform").append(youTubeSearch);
     $("#YTform").append(youTubeButton);
 
-  }
+}
 
-  
+
 function youTubeCreation() {
     console.log("Hi");
     var newTopic = $("#youTubeInput").val();
@@ -610,32 +618,32 @@ function youTubeCreation() {
 }
 
 function generateYouTubeWidgetHtml(response) {
-    $("#allVideos").empty(); 
+    $("#allVideos").empty();
     for (var i = 1; i < 5; i++) {
         console.log(response);
         var videoID = response.items[i].id.videoId;
-        var imgDiv = $("<div>").addClass("thumbnails"); 
+        var imgDiv = $("<div>").addClass("thumbnails");
         var br = $("<br>");
         var breaker = $("<br>");
         imgDiv.html("<img src=" + response.items[i].snippet.thumbnails.default.url + ">");
         $("#allVideos").append(imgDiv, br);
 
-        var titleID = response.items[i].snippet.title.substring(0,60); 
+        var titleID = response.items[i].snippet.title.substring(0, 60);
 
-        var videoLink = $("<p>").append("<a href='" + "https://www.youtube.com/watch?v=" + videoID+ "'target='_blank'>" + titleID + "</a>");
+        var videoLink = $("<p>").append("<a href='" + "https://www.youtube.com/watch?v=" + videoID + "'target='_blank'>" + titleID + "</a>");
         videoLink.addClass("YTlink");
 
         $("#allVideos").append(videoLink, breaker);
 
     }
-}   
+}
 
 function displayYouTubeWidget(youtubeWidgetHtml) {
     $("#youtube").append(youtubeWidgetHtml);
 }
 
 function gifListener() {
-    $(document).on("click", "#gif",function() {
+    $(document).on("click", "#gif", function () {
         event.preventDefault();
         gifWidget();
     })
@@ -643,12 +651,12 @@ function gifListener() {
 
 function gifWidget() {
     var apikey = "AGOnLXwDOWiIu3oC7OMWNFsQCMAElFt4"
-    var queryUrl = "http://api.giphy.com/v1/gifs/random?api_key=" + apikey+ "&limit=1";
-    getData(queryUrl, generateGifWidgetHtml, displayGifWidget); 
+    var queryUrl = "http://api.giphy.com/v1/gifs/random?api_key=" + apikey + "&limit=1";
+    getData(queryUrl, generateGifWidgetHtml, displayGifWidget);
 }
 
 function generateGifWidgetHtml(response) {
-    $("#gif").empty(); 
+    $("#gif").empty();
     var gifContainer = $("<div>").addClass("row");
     var gifSubContainer = $("<div>").addClass("col-xs-12");
 
@@ -665,9 +673,13 @@ function displayGifWidget(gifWidgetHtml) {
     $("#gif").append(gifWidgetHtml);
 }
 
-
-function triviaWidget() {
-    getData("https://opentdb.com/api.php?amount=10", generateTriviaHTML, displayTriviaWidget);
+function triviaWidget(category) {
+    var catg = "9";
+    if (category) {
+        catg = category;
+    }
+    var queryUrl = "https://opentdb.com/api.php?amount=10&category=" + catg;
+    getData(queryUrl, generateTriviaHTML, displayTriviaWidget);
 }
 
 var question_number = 0;
@@ -676,22 +688,43 @@ var correctAnswers = 0;
 var inCorrectAnswers = 0;
 
 function generateTriviaHTML(response) {
+
     triviaArray = response;
     var mainDiv = createHtmlTags("div", "class", "row", "");
     var colDiv = createHtmlTags("div", "class", "col-md-3", "");
     mainDiv.append(colDiv);
+    var triviaCategory = "";
+    if (triviaArray.results.length >= 0) {
+        triviaCategory = triviaArray.results[0].category;
+    }
 
     var card = $("<div>");
     card.addClass("card border-primary mb-3");
-    card.attr("style", "max-width: 15rem");
+    card.attr("style", "max-width: 18rem");
 
     var cardHeader = $("<div>");
     cardHeader.addClass("card-header");
-    cardHeader.text("Trivia Game");
+    cardHeader.text("Trivia - " + triviaCategory);
 
     var cardBody = $("<div>");
     cardBody.addClass("card-body text-primary weather-row");
 
+    var cardFooter = $("<div>");
+    cardFooter.addClass("card-footer bg-transparent border-success");
+    var triviaInput = $("<input>");
+    triviaInput.attr("id", "search-trivia");
+    triviaInput.attr("type", "text");
+    triviaInput.attr(palceholder = "Matrix");
+    triviaInput.attr("value", "");
+
+    var triviaSelect = getSelectHtmltag();
+    var triviaSubmitButton = $("<button>");
+    triviaSubmitButton.addClass("btn btn-default")
+    triviaSubmitButton.attr("id", "search");
+    triviaSubmitButton.attr("type", "submit");
+    triviaSubmitButton.text("Search Trivia");
+
+    cardFooter.append(triviaSelect);
     var gameDiv = $("<div>");
     gameDiv.attr("id", "gameDiv")
     gameDiv.show();
@@ -710,8 +743,36 @@ function generateTriviaHTML(response) {
 
     card.append(cardHeader);
     card.append(cardBody);
+    card.append(cardFooter);
+
 
     return card;
+}
+
+function getSelectHtmltag() {
+    var triviaCategory = [
+        { catCode: "9", catName: "General Knowlwdge" }, { catCode: "10", catName: "Entertainment: Books" }, { catCode: "11", catName: "Entertainment: Film" },
+        { catCode: "12", catName: "Entertainment: Music" }, { catCode: "13", catName: "Entertain: Musical & Theaters" }, { catCode: "14", catName: "Entertainment: Television" },
+        { catCode: "15", catName: "Entertainment: Video Games" }, { catCode: "16", catName: "Entertain: Board Games" }, { catCode: "17", catName: "Science & Nature" },
+        { catCode: "18", catName: "Science: Computers" }, { catCode: "19", catName: "Science: Mathematics" }, { catCode: "20", catName: "Mythology" },
+        { catCode: "21", catName: "Sports" }, { catCode: "22", catName: "Geography" }, { catCode: "23", catName: "History" },
+        { catCode: "24", catName: "Politics" }, { catCode: "25", catName: "Art" }, { catCode: "26", catName: "Celebrities" }, { catCode: "27", catName: "Animals" }
+    ];
+
+    var triviaOptions = [];
+    var triviaSelect = $("<select>");
+    triviaSelect.attr("id", "triviaSearch");
+
+    for (var i = 0; i < triviaCategory.length; i++) {
+
+        var categoryName = "";
+        categoryName = triviaCategory[i].catName;
+        triviaOptions[i] = $("<option>");
+        triviaOptions[i].attr("value", triviaCategory[i].catCode);
+        triviaOptions[i].text(categoryName);
+        triviaSelect.append(triviaOptions[i]);
+    }
+    return triviaSelect
 }
 
 //Load next quiz called at START START OVER and get next quiz
@@ -727,7 +788,6 @@ function loadNextQuiz() {
     qOptions = triviaArray.results[question_number].incorrect_answers;
     var pos = qOptions.indexOf(qCorrectAnswer);
     if (pos === -1) {
-        console.log("pos :" + pos);
         answerPos = answerMath[Math.floor(Math.random() * answerMath.length)];
         qOptions.splice(answerPos, 0, qCorrectAnswer);
     }
@@ -833,11 +893,21 @@ function loadResultDiv() {
 function createHtmlTags(elemnt, attributeType, attributeValue, innerHtmlVal) {
     var newHtmlTag = document.createElement(elemnt);
     newHtmlTag.setAttribute(attributeType, attributeValue);
-    console.log("innerHtmlVal :" + innerHtmlVal.length);
     if (innerHtmlVal.length > 0) {
         newHtmlTag.innerHTML = innerHtmlVal;
     }
     return newHtmlTag;
+}
+
+
+function searchTriviaEventistner() {
+    $("body").on("change", "#triviaSearch", function () {
+        correctAnswers = 0;
+        inCorrectAnswers = 0;
+        question_number = 0;
+        var catg = $("#triviaSearch").val();
+        triviaWidget(catg);
+  });
 }
 
 function reStartClickedEventListner() {
@@ -864,15 +934,100 @@ function displayTriviaWidget(triviaWidgetHtml) {
     loadNextQuiz();
 }
 
+
+// Movie Widget
+function movieWidget(movie) {
+    var apikey = "trilogy";
+    var newMovie = "Tag";
+    if (movie) {
+        newMovie = movie;
+    }
+    var queryUrl = "https://www.omdbapi.com/?t=" + newMovie + "&y=&plot=short&page=1&apikey=trilogy";
+    getData(queryUrl, generateMovieWidgetHtml, displayMovieWidget);
+}
+
+function generateMovieWidgetHtml(response) {
+    var newactors = response.Actors;
+    var newmoviename = response.Title;
+    var poster = response.Poster;
+    var posterImg = $("<img>");
+    posterImg.attr("src", poster);
+    $(".poster").append(posterImg);
+    $("#movie-input").text(newmoviename);
+    $(".actors").text("Actors :" + newactors);
+    var rating = [];
+    rating = response.Ratings;
+
+    var card = $("<div>");
+    card.addClass("card border-success xs-3");
+    card.attr("style", "max-width: 18rem");
+
+    var cardHeader = $("<div>");
+    cardHeader.addClass("card-header");
+
+    cardHeader.text("Movie: " + newmoviename);
+    var cardBody = $("<div>");
+    cardBody.addClass("card-body text-primary movier-row");
+
+    var cardBodyMovieInfoDiv = $("<div>");
+    cardBodyMovieInfoDiv.addClass("movie-col");
+    cardBodyMovieInfoDiv.append($("<p>").addClass("").text("Actors: "));
+    cardBodyMovieInfoDiv.append($("<p>").addClass("").text(newactors));
+    cardBodyMovieInfoDiv.append($("<p>").addClass("rating").text("Ratings :"));
+
+
+    for (var i = 0; i < rating.length; i++) {
+        cardBodyMovieInfoDiv.append($("<p>").addClass("temp").text(rating[i].Source + ": " + rating[i].Value));
+    }
+    cardBody.append(cardBodyMovieInfoDiv);
+    cardBody.append(posterImg);
+
+    var cardFooter = $("<div>");
+    cardFooter.addClass("card-footer bg-transparent border-success");
+    var movieInput = $("<input>");
+    movieInput.attr("id", "search-movie");
+    movieInput.attr("type", "text");
+    movieInput.attr(palceholder = "Matrix");
+    movieInput.attr("value", "");
+
+    var movieSubmitButton = $("<button>");
+    movieSubmitButton.addClass("btn btn-default")
+    movieSubmitButton.attr("id", "search");
+    movieSubmitButton.attr("type", "submit");
+    movieSubmitButton.text("Search Movie");
+
+    cardFooter.append(movieInput);
+    cardFooter.append(movieSubmitButton);
+
+    card.append(cardHeader);
+    card.append(cardBody);
+    card.append(cardFooter);
+    return card;
+}
+
+function displayMovieWidget(movieWidgetHtml) {
+    $("#movie").empty();
+    $("#movie").html(movieWidgetHtml);
+}
+
+function searchMovieEventistner() {
+    $("body").on("click", "#search", function () {
+        var city = $("#search-movie").val();
+        movieWidget(city);
+    });
+}
+
+// Movie Widget end
+
 function getData(queryUrl, generateWidgetHtml, displayWidget) {
     console.log(queryUrl);
     $.ajax({
         url: queryUrl,
-        success: function(response) {
+        success: function (response) {
             var widgetHtml = generateWidgetHtml(response);
             displayWidget(widgetHtml);
         },
-        error: function(XMLHttpRequest, textStatus, errorThrown) {
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
             alert("Sorry, invalid request.");
             console.log("textStatus: " + textStatus + " errorThrown: " + errorThrown);
         }
@@ -909,16 +1064,16 @@ function getData(queryUrl, generateWidgetHtml, displayWidget) {
 //     });
 // }
 
-function dragMoveListener (event) {
+function dragMoveListener(event) {
     var target = event.target,
-    // keep the dragged position in the data-x/data-y attributes
-    x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
-    y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+        // keep the dragged position in the data-x/data-y attributes
+        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
     // translate the element
     target.style.webkitTransform =
-    target.style.transform =
-    'translate(' + x + 'px, ' + y + 'px)';
+        target.style.transform =
+        'translate(' + x + 'px, ' + y + 'px)';
 
     // update the posiion attributes
     target.setAttribute('data-x', x);
@@ -932,47 +1087,47 @@ window.dragMoveListener = dragMoveListener;
 function resizableDivListener() {
     // target elements with the "resize-drag" class
     interact('.resize-drag')
-    .draggable({
-        onmove: window.dragMoveListener,
-        restrict: {
-            restriction: 'parent',
-            elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
-        },
-    })
-    .resizable({
-        // resize from all edges and corners
-        edges: { left: true, right: true, bottom: true, top: true },
+        .draggable({
+            onmove: window.dragMoveListener,
+            restrict: {
+                restriction: 'parent',
+                elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+            },
+        })
+        .resizable({
+            // resize from all edges and corners
+            edges: { left: true, right: true, bottom: true, top: true },
 
             // keep the edges inside the parent
             restrictEdges: {
-            outer: 'parent',
-            endOnly: true,
-        },
+                outer: 'parent',
+                endOnly: true,
+            },
 
-        // minimum size
-        restrictSize: {
-        min: { width: 100, height: 50 },
-        },
+            // minimum size
+            restrictSize: {
+                min: { width: 100, height: 50 },
+            },
 
-        inertia: true,
-    })
-    .on('resizemove', function (event) {
-        var target = event.target,
-        x = (parseFloat(target.getAttribute('data-x')) || 0),
-        y = (parseFloat(target.getAttribute('data-y')) || 0);
+            inertia: true,
+        })
+        .on('resizemove', function (event) {
+            var target = event.target,
+                x = (parseFloat(target.getAttribute('data-x')) || 0),
+                y = (parseFloat(target.getAttribute('data-y')) || 0);
 
-        // update the element's style
-        target.style.width  = event.rect.width + 'px';
-        target.style.height = event.rect.height + 'px';
+            // update the element's style
+            target.style.width = event.rect.width + 'px';
+            target.style.height = event.rect.height + 'px';
 
-        // translate when resizing from top or left edges
-        x += event.deltaRect.left;
-        y += event.deltaRect.top;
+            // translate when resizing from top or left edges
+            x += event.deltaRect.left;
+            y += event.deltaRect.top;
 
-        target.style.webkitTransform = target.style.transform =
-        'translate(' + x + 'px,' + y + 'px)';
+            target.style.webkitTransform = target.style.transform =
+                'translate(' + x + 'px,' + y + 'px)';
 
-        target.setAttribute('data-x', x);
-        target.setAttribute('data-y', y);
-    });
+            target.setAttribute('data-x', x);
+            target.setAttribute('data-y', y);
+        });
 }
