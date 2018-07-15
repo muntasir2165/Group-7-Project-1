@@ -407,6 +407,7 @@ function generateAndDisplayWidget(widgetName, addWidgetToLocalStorage) {
             if (addWidgetToLocalStorage) {
                 updateWidgetInfoToLocalStorage("add", widgetName); 
             }
+            toDoListWidget();
             break;
         default:
             console.log("The " + widgetName+ " widget cannot be displayed on the dashboad at the moment");
