@@ -1,40 +1,122 @@
 var database = null;
-var registeredUserNameArray =[];
+var registeredUserNameArray = [];
 var registeredUserWidgetInfoObject ={};
-var authenticatedUsername = "";
+var loggedInUsername = "";
+
+// global variables for the toDoList widget
 var toDoArray = [];
 
+// global variables for the trivia widget
+var question_number = 0;
+var triviaArray = [];
+var correctAnswers = 0;
+var inCorrectAnswers = 0;
+
+
 $(document).ready(function() {
-    emptyLocalStorageForUnAuthenticatedUser();
     // a variable to reference the database
     database = initializeFirebase();
-    deleteDatabaseInfo();
-    saveWidgetStateButtonClickListener();
-    authenticateButtonClickListener();
+
+    getLoggedInUsernameFromLocalStorage(); //set the loggedInUsername variable if a user logged in previously
+    displayLoggedInUserInDropDownButton()
+    emptyLocalStorageForUnAuthenticatedUser();
+
+    clearDatabaseButonListener(); //for firebase debugging
+    clearLocalStorageButtonListener(); //for localstorage debugging
+
+    logInClickListener();
+    logOutClickListener();
     registerButtonClickListener();
-    // getUserNameListing();
+    saveWidgetStateButtonClickListener();
+
     updateRegisteredUserNameArray();
     
+    clock();
     clickWidgetButtonListener();
-    clearLocalStorageButtonListener(); //for local storage debugging only
-    // draggableDivListener();
+    clickWidgetListener();
+    generateWidgetFromLocalStorage();
+    smoothScrolling(); //for smooth scrolling when the Google Maps widget button is clicked
+
     resizableDivListener();
     newsCategoryButtonClickListener();
     cryptocurrencyRefreshButtonListener();
-    generateWidgetFromLocalStorage();
-    clickWidgetListener();
     searchCityWeatherEventListner();
     reStartClickedEventListner();
-    clock();
     YTbuttonClickListener(); 
-    gifListener(); 
+    gifListener();
     addToDoBtnClickListener();
     taskBtnClassClickListener();
 });
 
+function smoothScrolling() {
+    // the followng smooth scrolling code was copied from
+    // https://css-tricks.com/snippets/jquery/smooth-scrolling/
+
+    // Select all links with hashes
+    $('a[href*="#"]')
+        // Remove links that don't actually link to anything
+        .not('[href="#"]')
+        .not('[href="#0"]')
+        .click(function(event) {
+        // On-page links
+        if (
+            location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') 
+            && 
+            location.hostname == this.hostname
+        ) {
+            // Figure out element to scroll to
+            var target = $(this.hash);
+            target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
+            // Does a scroll target exist?
+            if (target.length) {
+                // Only prevent default if animation is actually gonna happen
+                event.preventDefault();
+                $('html, body').animate({
+                    scrollTop: target.offset().top
+                }, 1000, function() {
+                    // Callback after animation
+                    // Must change focus!
+                    var $target = $(target);
+                    $target.focus();
+                    if ($target.is(":focus")) { // Checking if the target was focused
+                        return false;
+                    } else {
+                        $target.attr('tabindex','-1'); // Adding tabindex for elements not focusable
+                        $target.focus(); // Set focus again
+                    };
+                });
+            }
+        }
+    });
+}
+
 function emptyLocalStorageForUnAuthenticatedUser() {
-    if (!authenticatedUsername) {
+    if (!loggedInUsername) {
         localStorage.clear();
+    } else {
+        if ("No preference set yet" === registeredUserWidgetInfoObject[loggedInUsername]) {
+            clearWidgetInfoObjectFromLocalStorage();
+        }
+    }
+}
+
+function setLoggedInUsernameToLocalStorage(username) {
+    if (username) {
+        loggedInUsername = username;
+        localStorage.setItem("loggedInUsername", loggedInUsername);
+    }
+}
+
+function getLoggedInUsernameFromLocalStorage() {
+    if (localStorage.getItem("loggedInUsername")) {
+        loggedInUsername =  localStorage.getItem("loggedInUsername");
+    }
+}
+
+function resetLoggedInUsernameToLocalStorage() {
+    if (localStorage.getItem("loggedInUsername")) {
+        localStorage.removeItem("loggedInUsername");
+        loggedInUsername = "";
     }
 }
 
@@ -54,12 +136,14 @@ function initializeFirebase() {
 function saveWidgetStateButtonClickListener() {
     $("#save-widget-state-button").on("click", function() {
         event.preventDefault();
-        if (!authenticatedUsername) {
-            displayFeedback("You have not registered and/or authenticated yet");
+        if (!loggedInUsername) {
+            displayFeedback("save-widget-state-feedback-div", "You have not registered and/or logged in yet");
         } else {
-            saveUserWidgetInfoToDatabase(authenticatedUsername);
-            displayFeedback("Saved widget information");
-            setTimeout(displayFeedback, 10 * 1000);
+            saveUserWidgetInfoToDatabase(loggedInUsername);
+            displayFeedback("save-widget-state-feedback-div", "Saved widget information");
+            setTimeout(displayFeedback, 3 * 1000, "save-widget-state-feedback-div");
+            $("#save-widget-state-modal").modal('hide');
+
         }
     });   
 }
@@ -68,47 +152,109 @@ function saveUserWidgetInfoToDatabase(username) {
     database.ref().child("users/" + username).update(getWidgetInfoFromLocalStorage());
 }
 
-function authenticateButtonClickListener() {
-    $("#authenticate-button").on("click", function() {
+function logInClickListener() {
+    $("#log-in-button").on("click", function() {
         event.preventDefault();
-        var username = $("#username").val();
+        var username = $("#log-in-username").val();
         if (!isUsernameValid(username)) {
-            displayFeedback("Please enter a valid username that must be non-empty strings and can't contain \".\", \"#\", \"$\", \"[\", or \"]\"");
-            // setTimeout(displayFeedback, 10 * 1000);
+            displayFeedback("log-in-feedback-div", "Please enter a valid username that must be non-empty strings and can't contain \".\", \"#\", \"$\", \"[\", or \"]\"");
+            setTimeout(function() {
+                displayFeedback("log-in-feedback-div", "");
+            }, 3 * 1000);
         } else if (isUsernameUnique(username)) {
-            displayFeedback("The username " + username + " is not registered yet");
-        }
-        else {
-            authenticatedUsername = username;
-            if ("No preference set yet" !== registeredUserWidgetInfoObject[authenticatedUsername]) {
-                setWidgetInfoToLocalStorage(registeredUserWidgetInfoObject[authenticatedUsername]);
+            displayFeedback("log-in-feedback-div", "The username " + username + " is not registered yet");
+            setTimeout(function() {
+                displayFeedback("log-in-feedback-div", "");
+            }, 3 * 1000);
+        } else if (loggedInUsername) {
+            console.log("inside else if loggedInUsername", loggedInUsername);
+            displayFeedback("log-in-feedback-div", "Currently " + loggedInUsername + " is logged in. Please log out first before logging in as a different user");
+            setTimeout(function() {
+                displayFeedback("log-in-feedback-div", "");
+            }, 3 * 1000);
+        } else {
+            setLoggedInUsernameToLocalStorage(username);
+            if ("No preference set yet" !== registeredUserWidgetInfoObject[loggedInUsername]) {
+                setWidgetInfoToLocalStorage(registeredUserWidgetInfoObject[loggedInUsername]);
                 generateWidgetFromLocalStorage();
             }
-            displayFeedback("Welcome back " + authenticatedUsername + "! You widgets are now displayed!");
-            setTimeout(displayFeedback, 10 * 1000);
+            displayFeedback("log-in-feedback-div", "Welcome back " + loggedInUsername + "! You saved widgets are now displayed!");
+            setTimeout(function() {
+                displayFeedback("log-in-feedback-div", "");
+                hideModal("log-in-modal");
+            }, 3 * 1000);
         }
-        $("#username").val("");
-        // database.ref().child("users").remove();
+        $("#log-in-username").val("");
+        displayLoggedInUserInDropDownButton();
     });   
+}
+
+function displayLoggedInUserInDropDownButton() {
+    if (loggedInUsername) {
+        $("#dropdownMenuButton").text(loggedInUsername);
+        $("#dropdownMenuButton").removeClass("btn-secondary");
+        $("#dropdownMenuButton").addClass("btn-success");
+    }else {
+        $("#dropdownMenuButton").text("Not Logged In");
+        $("#dropdownMenuButton").addClass("btn-secondary");
+        $("#dropdownMenuButton").removeClass("btn-success");
+    }
+}
+
+function logOutClickListener() {
+    $("#log-out-button").on("click", function() {
+        event.preventDefault();
+        if (loggedInUsername) {
+            var username = loggedInUsername;
+            resetLoggedInUsernameToLocalStorage();
+            clearWidgetInfoObjectFromLocalStorage();
+            generateWidgetFromLocalStorage();
+            displayFeedback("log-out-feedback-div", "The username " + username + " has been logged out");
+            setTimeout(function() {
+                displayFeedback("log-out-feedback-div", "");
+                hideModal("log-out-modal");
+            }, 3 * 1000);
+        }
+        else {
+            displayFeedback("log-out-feedback-div", "There's no logged in user. Log out failed.");
+            setTimeout(function() {
+                displayFeedback("log-out-feedback-div", "");
+                hideModal("log-out-modal");
+            }, 3 * 1000);
+            
+        }
+        displayLoggedInUserInDropDownButton();
+    });   
+}
+
+function hideModal(modalId) {
+    $("#" + modalId).modal('hide');
 }
 
 function registerButtonClickListener() {
     $("#register-button").on("click", function() {
         event.preventDefault();
-        var username = $("#username").val();
+        var username = $("#register-username").val();
         if (!isUsernameValid(username)) {
-            displayFeedback("Please enter a valid username that must be non-empty strings and can't contain \".\", \"#\", \"$\", \"[\", or \"]\"");
-            // setTimeout(displayFeedback, 10 * 1000);
+            displayFeedback("register-feedback-div", "Please enter a valid username that must be a non-empty string and can't contain \".\", \"#\", \"$\", \"[\", or \"]\"");
+            setTimeout(function() {
+                displayFeedback("register-feedback-div", "");
+            }, 3 * 1000);
         } else if (!isUsernameUnique(username)) {
-            displayFeedback("The username " + username + " is already registered");
+            displayFeedback("register-feedback-div", "The username " + username + " is already registered");
+           setTimeout(function() {
+                displayFeedback("register-feedback-div", "");
+            }, 3 * 1000);
         }
         else {
             registerUsername(username);
-            displayFeedback("Registered the username: " + username);
-            setTimeout(displayFeedback, 10 * 1000);
+            displayFeedback("register-feedback-div", "Registered the username: " + username);
+            setTimeout(function() {
+                displayFeedback("register-feedback-div", "");
+                hideModal("register-modal");
+            }, 3 * 1000);
         }
-        $("#username").val("");
-        // database.ref().child("users").remove();
+        $("#register-username").val("");
     });   
 }
 
@@ -139,19 +285,6 @@ function isUsernameUnique(username) {
     return true;
 }
 
-// function getUserNameListing() {
-//     database.ref().once("value", function(snapshot) {
-//         console.log("inside getUserNameListing()");
-//         registeredUserNameArray = [];
-//         if (snapshot.val() && snapshot.val()["users"]) {
-//             jQuery.each(snapshot.val()["users"], function(username, value) {
-//                 registeredUserNameArray.push(username);
-//             });
-//             console.log("registeredUserNameArray: " + registeredUserNameArray);
-//         }
-//     });
-// }
-
 function updateRegisteredUserNameArray() {
     database.ref().on("value", function(snapshot) {
         console.log("inside updateRegisteredUserNameArray()");
@@ -171,14 +304,15 @@ function registerUsername(username) {
     database.ref().child("users/" + username).set("No preference set yet");
 }
 
-function displayFeedback(message) {
+function displayFeedback(feedbackDivId, message) {
     if (message) {
-        $("#feedback-div").text(message);
+        $("#" + feedbackDivId).text(message);
     } else {
-        $("#feedback-div").text("");
+        $("#" + feedbackDivId).text("");
     }
 }
-function deleteDatabaseInfo() {
+
+function clearDatabaseButonListener() {
     $("#clear-database-button").on("click", function() {
         // database.ref().child("users").remove();
         database.ref().remove();
@@ -194,14 +328,18 @@ function clock() {
 function clickWidgetButtonListener() {
     $(document).on("click", ".widget-btn", function() {
         var widgetName = $(this).attr("data-widget");
-        if ($("#" + widgetName).length !== 0){
-            $("#" + widgetName).remove();
-            console.log("The " + widgetName+ " has been removed from the screen");
-            updateWidgetInfoToLocalStorage("remove", widgetName);
-        } else {
-            generateAndDisplayWidgetContainer(widgetName);
-            var addWidgetToLocalStorage = true;
-            generateAndDisplayWidget(widgetName, addWidgetToLocalStorage);
+        // google maps is the one widget that doesn't display on the dashboard but appear on a div
+        // below it and so, widget related functions calls don't apply to it
+        if (widgetName !== "googleMaps") {
+            if ($("#" + widgetName).length !== 0){
+                $("#" + widgetName).remove();
+                console.log("The " + widgetName+ " has been removed from the screen");
+                updateWidgetInfoToLocalStorage("remove", widgetName);
+            } else {
+                generateAndDisplayWidgetContainer(widgetName);
+                var addWidgetToLocalStorage = true;
+                generateAndDisplayWidget(widgetName, addWidgetToLocalStorage);
+            }
         }
     });
 }
@@ -210,7 +348,6 @@ function generateAndDisplayWidgetContainer(widgetName) {
     var dashboard = $("#dashboard");
     var widgetDiv = $("<div>");
     widgetDiv.addClass("resize-drag");
-    // widgetDiv.addClass("draggable");
     widgetDiv.text(widgetName); //for debugging purposes only
     widgetDiv.attr("id", widgetName);
     dashboard.append(widgetDiv);
@@ -247,9 +384,6 @@ function generateAndDisplayWidget(widgetName, addWidgetToLocalStorage) {
             if (addWidgetToLocalStorage) {
                 updateWidgetInfoToLocalStorage("add", widgetName);
             }
-            break;
-        case "google-maps":
-            console.log("google-maps");
             break; 
         case "gif": 
             gifWidget(); 
@@ -278,6 +412,12 @@ function clearLocalStorageButtonListener() {
         localStorage.clear();
         location.reload();
     });
+}
+
+function clearWidgetInfoObjectFromLocalStorage() {
+    if (localStorage.getItem("widgetInfoObject")) {
+        localStorage.removeItem("widgetInfoObject");
+    }
 }
 
 function getWidgetInfoFromLocalStorage() {
@@ -311,12 +451,20 @@ function updateWidgetInfoToLocalStorage(update, widgetName) {
 
 function generateWidgetFromLocalStorage() {
     var widgetInfoObject = getWidgetInfoFromLocalStorage();
-    $.each(widgetInfoObject, function(widgetName, widgetInfo){
-        generateAndDisplayWidgetContainer(widgetName);
-        var addWidgetToLocalStorage = false; //false because the widget already exists in local storage
-        generateAndDisplayWidget(widgetName, addWidgetToLocalStorage);
-        updateWidgetHtmlAttributes(widgetName, widgetInfo);
-    });
+    if ($.isEmptyObject(widgetInfoObject)) {
+        displayEmptyDashboard();
+    } else {
+        $.each(widgetInfoObject, function(widgetName, widgetInfo){
+            generateAndDisplayWidgetContainer(widgetName);
+            var addWidgetToLocalStorage = false; //false because the widget already exists in local storage
+            generateAndDisplayWidget(widgetName, addWidgetToLocalStorage);
+            updateWidgetHtmlAttributes(widgetName, widgetInfo);
+        });
+    }
+}
+
+function displayEmptyDashboard() {
+    $("#dashboard").empty();
 }
 
 function updateWidgetHtmlAttributes(widgetName, widgetInfo) {
@@ -356,7 +504,6 @@ function addToDoFunction() {
     toDoListWidget();
 }
 
-
 function toDoListWidget() {
     $("#toDoLog").empty();
     for (i = 0; i < toDoArray.length; i++) {
@@ -384,7 +531,6 @@ function removeToDoFunction() {
     toDoListWidget();
 
 }
-
 
 function newsCategoryButtonClickListener() {
     $(document).on("click", ".newsButtonClass", newsWidget);
@@ -670,11 +816,6 @@ function triviaWidget() {
     getData("https://opentdb.com/api.php?amount=10", generateTriviaHTML, displayTriviaWidget);
 }
 
-var question_number = 0;
-var triviaArray = [];
-var correctAnswers = 0;
-var inCorrectAnswers = 0;
-
 function generateTriviaHTML(response) {
     triviaArray = response;
     var mainDiv = createHtmlTags("div", "class", "row", "");
@@ -878,36 +1019,6 @@ function getData(queryUrl, generateWidgetHtml, displayWidget) {
         }
     });
 }
-
-// function draggableDivListener() {
-//     // target elements with the "draggable" class
-//     interact('.draggable')
-//     .draggable({
-//         // enable inertial throwing
-//         inertia: true,
-//         // keep the element within the area of it's parent
-//         restrict: {
-//             restriction: "parent",
-//             endOnly: true,
-//             elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
-//         },
-//         // enable autoScroll
-//         autoScroll: true,
-
-//         // call this function on every dragmove event
-//         onmove: dragMoveListener,
-//         // call this function on every dragend event
-//         onend: function (event) {
-//             var textEl = event.target.querySelector('p');
-
-//             textEl && (textEl.textContent =
-//                 'moved a distance of '
-//                 + (Math.sqrt(Math.pow(event.pageX - event.x0, 2) +
-//                     Math.pow(event.pageY - event.y0, 2) | 0))
-//                 .toFixed(2) + 'px');
-//         }
-//     });
-// }
 
 function dragMoveListener (event) {
     var target = event.target,
