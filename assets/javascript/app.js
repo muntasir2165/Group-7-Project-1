@@ -1,7 +1,9 @@
 var database = null;
 var registeredUserNameArray =[];
 var registeredUserWidgetInfoObject ={};
-var authenticatedUsername = "";
+var loggedInUsername = "";
+
+// global variables for the toDoList widget
 var toDoArray = [];
 
 // global variables for the trivia widget
@@ -17,14 +19,12 @@ $(document).ready(function() {
     database = initializeFirebase();
     deleteDatabaseInfo();
     saveWidgetStateButtonClickListener();
-    authenticateButtonClickListener();
+    logInClickListener();
     registerButtonClickListener();
-    // getUserNameListing();
     updateRegisteredUserNameArray();
     
     clickWidgetButtonListener();
     clearLocalStorageButtonListener(); //for local storage debugging only
-    // draggableDivListener();
     resizableDivListener();
     newsCategoryButtonClickListener();
     cryptocurrencyRefreshButtonListener();
@@ -34,13 +34,56 @@ $(document).ready(function() {
     reStartClickedEventListner();
     clock();
     YTbuttonClickListener(); 
-    gifListener(); 
+    gifListener();
+    smoothScrolling(); //for smooth scrolling when the Google Maps widget button is clicked
     addToDoBtnClickListener();
     taskBtnClassClickListener();
 });
 
+function smoothScrolling() {
+    // the followng smooth scrolling code was copied from
+    // https://css-tricks.com/snippets/jquery/smooth-scrolling/
+
+    // Select all links with hashes
+    $('a[href*="#"]')
+        // Remove links that don't actually link to anything
+        .not('[href="#"]')
+        .not('[href="#0"]')
+        .click(function(event) {
+        // On-page links
+        if (
+            location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') 
+            && 
+            location.hostname == this.hostname
+        ) {
+            // Figure out element to scroll to
+            var target = $(this.hash);
+            target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
+            // Does a scroll target exist?
+            if (target.length) {
+                // Only prevent default if animation is actually gonna happen
+                event.preventDefault();
+                $('html, body').animate({
+                    scrollTop: target.offset().top
+                }, 1000, function() {
+                    // Callback after animation
+                    // Must change focus!
+                    var $target = $(target);
+                    $target.focus();
+                    if ($target.is(":focus")) { // Checking if the target was focused
+                        return false;
+                    } else {
+                        $target.attr('tabindex','-1'); // Adding tabindex for elements not focusable
+                        $target.focus(); // Set focus again
+                    };
+                });
+            }
+        }
+    });
+}
+
 function emptyLocalStorageForUnAuthenticatedUser() {
-    if (!authenticatedUsername) {
+    if (!loggedInUsername) {
         localStorage.clear();
     }
 }
@@ -61,12 +104,14 @@ function initializeFirebase() {
 function saveWidgetStateButtonClickListener() {
     $("#save-widget-state-button").on("click", function() {
         event.preventDefault();
-        if (!authenticatedUsername) {
-            displayFeedback("You have not registered and/or authenticated yet");
+        if (!loggedInUsername) {
+            displayFeedback("save-widget-state-feedback-div", "You have not registered and/or authenticated yet");
         } else {
-            saveUserWidgetInfoToDatabase(authenticatedUsername);
-            displayFeedback("Saved widget information");
-            setTimeout(displayFeedback, 10 * 1000);
+            saveUserWidgetInfoToDatabase(loggedInUsername);
+            displayFeedback("save-widget-state-feedback-div", "Saved widget information");
+            setTimeout(displayFeedback, 3 * 1000, "save-widget-state-feedback-div");
+            $("#save-widget-state-modal").modal('hide');
+
         }
     });   
 }
@@ -75,46 +120,57 @@ function saveUserWidgetInfoToDatabase(username) {
     database.ref().child("users/" + username).update(getWidgetInfoFromLocalStorage());
 }
 
-function authenticateButtonClickListener() {
-    $("#authenticate-button").on("click", function() {
+function logInClickListener() {
+    $("#log-in-button").on("click", function() {
         event.preventDefault();
-        var username = $("#username").val();
+        var username = $("#log-in-username").val();
         if (!isUsernameValid(username)) {
-            displayFeedback("Please enter a valid username that must be non-empty strings and can't contain \".\", \"#\", \"$\", \"[\", or \"]\"");
-            // setTimeout(displayFeedback, 10 * 1000);
+            displayFeedback("log-in-feedback-div", "Please enter a valid username that must be non-empty strings and can't contain \".\", \"#\", \"$\", \"[\", or \"]\"");
         } else if (isUsernameUnique(username)) {
-            displayFeedback("The username " + username + " is not registered yet");
+            displayFeedback("log-in-feedback-div", "The username " + username + " is not registered yet");
+
         }
         else {
-            authenticatedUsername = username;
-            if ("No preference set yet" !== registeredUserWidgetInfoObject[authenticatedUsername]) {
-                setWidgetInfoToLocalStorage(registeredUserWidgetInfoObject[authenticatedUsername]);
+            loggedInUsername = username;
+            console.log("inside else: ");
+            if ("No preference set yet" !== registeredUserWidgetInfoObject[loggedInUsername]) {
+                setWidgetInfoToLocalStorage(registeredUserWidgetInfoObject[loggedInUsername]);
                 generateWidgetFromLocalStorage();
             }
-            displayFeedback("Welcome back " + authenticatedUsername + "! You widgets are now displayed!");
-            setTimeout(displayFeedback, 10 * 1000);
+            $("#log-in-modal").modal('hide');
+            displayLoggedInUserInDropDownButton();
+            // displayFeedback("Welcome back " + loggedInUsername + "! You widgets are now displayed!");
+            // setTimeout(displayFeedback, 10 * 1000);
         }
-        $("#username").val("");
+        $("#log-in-username").val("");
+        displayFeedback("log-in-feedback-div", "");
         // database.ref().child("users").remove();
     });   
+}
+
+function displayLoggedInUserInDropDownButton() {
+    $("#dropdownMenuButton").text(loggedInUsername);
+    $("#dropdownMenuButton").removeClass("btn-secondary");
+    $("#dropdownMenuButton").addClass("btn-success");
 }
 
 function registerButtonClickListener() {
     $("#register-button").on("click", function() {
         event.preventDefault();
-        var username = $("#username").val();
+        var username = $("#register-username").val();
         if (!isUsernameValid(username)) {
-            displayFeedback("Please enter a valid username that must be non-empty strings and can't contain \".\", \"#\", \"$\", \"[\", or \"]\"");
-            // setTimeout(displayFeedback, 10 * 1000);
+            displayFeedback("register-feedback-div", "Please enter a valid username that must be non-empty strings and can't contain \".\", \"#\", \"$\", \"[\", or \"]\"");
         } else if (!isUsernameUnique(username)) {
-            displayFeedback("The username " + username + " is already registered");
+            displayFeedback("register-feedback-div", "The username " + username + " is already registered");
         }
         else {
             registerUsername(username);
-            displayFeedback("Registered the username: " + username);
-            setTimeout(displayFeedback, 10 * 1000);
+            displayFeedback("register-feedback-div", "Registered the username: " + username);
+            setTimeout(displayFeedback, 3 * 1000, "register-feedback-div");
+            $("#register-modal").modal('hide');
         }
-        $("#username").val("");
+        $("#register-username").val("");
+        displayFeedback("register-feedback-div", "");
         // database.ref().child("users").remove();
     });   
 }
@@ -165,11 +221,11 @@ function registerUsername(username) {
     database.ref().child("users/" + username).set("No preference set yet");
 }
 
-function displayFeedback(message) {
+function displayFeedback(feedbackDivId, message) {
     if (message) {
-        $("#feedback-div").text(message);
+        $("#" + feedbackDivId).text(message);
     } else {
-        $("#feedback-div").text("");
+        $("#" + feedbackDivId).text("");
     }
 }
 function deleteDatabaseInfo() {
@@ -349,7 +405,6 @@ function addToDoFunction() {
     console.log(toDoArray)
     toDoListWidget();
 }
-
 
 function toDoListWidget() {
     $("#toDoLog").empty();
