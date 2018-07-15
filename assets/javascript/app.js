@@ -2,6 +2,7 @@ var database = null;
 var registeredUserNameArray =[];
 var registeredUserWidgetInfoObject ={};
 var authenticatedUsername = "";
+var toDoArray = [];
 
 $(document).ready(function() {
     emptyLocalStorageForUnAuthenticatedUser();
@@ -27,6 +28,8 @@ $(document).ready(function() {
     clock();
     YTbuttonClickListener(); 
     gifListener(); 
+    addToDoBtnClickListener();
+    taskBtnClassClickListener();
 });
 
 function emptyLocalStorageForUnAuthenticatedUser() {
@@ -254,6 +257,9 @@ function generateAndDisplayWidget(widgetName, addWidgetToLocalStorage) {
                 updateWidgetInfoToLocalStorage("add", widgetName); 
             }
             break; 
+        case "toDoList":
+            createToDoInput();
+            break;
         default:
             console.log("The " + widgetName+ " widget cannot be displayed on the dashboad at the moment");
     }
@@ -318,6 +324,67 @@ function updateWidgetHtmlAttributes(widgetName, widgetInfo) {
         $("#" + widgetName).attr(attribute, value);
     });
 }
+
+function createToDoInput() {
+    $("#toDoList").append($("<div>").attr("id", "toDoRow"));
+    $("#toDoRow").addClass("row");
+    $("#toDoRow").append($("<div>").attr("id", "toDoColumn"));
+    $("#toDoColumn").addClass("col-xs-12");
+    $("#toDoColumn").append($("<form>").attr("id", "toDoForm"));
+    $("#toDoForm").append($("<input>").attr("id", "toDoInput"));
+    $("#toDoInput").attr("type", "text");
+    $("#toDoForm").append($("<input>").attr("id", "addToDoBtn"));
+    $("#addToDoBtn").attr("type", "submit");
+    $("#addToDoBtn").attr("value", "Add a To-Do");
+    $("#toDoColumn").append($("<div>").attr("id", "toDoLog"));
+}
+
+function addToDoBtnClickListener() {
+    $(document).on("click", "#addToDoBtn", addToDoFunction);
+}
+
+function taskBtnClassClickListener() {
+    $(document).on("click", ".taskBtnClass", removeToDoFunction);
+}
+
+function addToDoFunction() {
+    event.preventDefault();
+    var task = $("#toDoInput").val().trim();
+    toDoArray.push(task);
+    console.log("The task is: " + task);
+    console.log(toDoArray)
+    toDoListWidget();
+}
+
+
+function toDoListWidget() {
+    $("#toDoLog").empty();
+    for (i = 0; i < toDoArray.length; i++) {
+        var taskDiv = $("<div>").append(toDoArray[i]);
+        taskDiv.attr("data-task", toDoArray[i])
+        var taskBtn = $("<button>").addClass("taskBtnClass");
+        taskBtn.append("✓");
+        taskBtn.attr("data-task", toDoArray[i])
+        var breaker = "&nbsp;";
+        var br = $("<br>");
+        taskDiv.prepend(taskBtn, breaker);
+        $("#toDoLog").append(br, taskDiv);
+    }
+}
+
+function removeToDoFunction() {
+    event.preventDefault();
+    var task = $(this).attr("data-task");
+    console.log("This is the task to delete: " + task);
+    console.log("Before splice: " + toDoArray);
+    var deletedTask = toDoArray.indexOf(task);
+    console.log("This is what I'm getting index of: " + deletedTask);
+    toDoArray.splice(deletedTask, 1);
+    console.log("After the splice: " + toDoArray);
+    toDoListWidget();
+
+}
+
 
 function newsCategoryButtonClickListener() {
     $(document).on("click", ".newsButtonClass", newsWidget);
