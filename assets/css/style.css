@@ -73,6 +73,11 @@ img.widget-image {
     width: 100%;
 }
 
+
+#movieImg {
+    width: 100%;
+}
+
 #google-search-bar {
     margin: 8px;
 
@@ -159,6 +164,10 @@ table.gsc-search-box {
    /* font-size: 10px; */
    color: black;
    background-color: white;
+}
+
+#trivia #triviaSearch {
+    width: 90%;
 }
 
 /* Trivia widget styling ends  */
@@ -337,3 +346,35 @@ table.gsc-search-box {
     width: 345px;
 }
 /* Google Maps styling ends */
+
+
+/* Movie Widget Styling */
+#movie img{
+    width: 200px;
+    height:  200px;
+    vertical-align: top;
+}
+
+#movie {
+    max-width: 240px;
+    max-height: 160px;
+    border-radius: 25px;
+}
+#movie #search {
+    margin-top: 12px;
+    background-color: lightgray;
+}
+#movie .movie-col {
+    display: flex;
+    flex-direction: column;
+    margin-left: 0px;
+    padding: 7px;
+}
+#movie p{
+    margin-bottom: 0px;
+}
+
+#movie .rating{
+    margin-top: 5px;
+}
+/* Movie Widget Styling */

@@ -28,7 +28,9 @@ $(document).ready(function() {
     logOutClickListener();
     registerButtonClickListener();
     saveWidgetStateButtonClickListener();
-
+    searchMovieEventistner();
+    searchTriviaEventistner();
+    
     updateRegisteredUserNameArray();
     
     clock();
@@ -363,6 +365,12 @@ function generateAndDisplayWidget(widgetName, addWidgetToLocalStorage) {
             break;
             case "trivia":
             triviaWidget();
+            if (addWidgetToLocalStorage) {
+                updateWidgetInfoToLocalStorage("add", widgetName);
+            }
+            break;
+            case "movie":
+            movieWidget();
             if (addWidgetToLocalStorage) {
                 updateWidgetInfoToLocalStorage("add", widgetName);
             }
@@ -810,29 +818,55 @@ function generateGifWidgetHtml(response) {
 function displayGifWidget(gifWidgetHtml) {
     $("#gif").append(gifWidgetHtml);
 }
+/// trivia widget
 
+function triviaWidget(category) {
+    var catg = "9";
+     if (category) {
+         catg = category;
+     }
+     var queryUrl = "https://opentdb.com/api.php?amount=10&category="+catg;
+     getData(queryUrl,generateTriviaHTML, displayTriviaWidget);
+ }
 
-function triviaWidget() {
-    getData("https://opentdb.com/api.php?amount=10", generateTriviaHTML, displayTriviaWidget);
-}
-
-function generateTriviaHTML(response) {
+ function generateTriviaHTML(response) {
+   
     triviaArray = response;
     var mainDiv = createHtmlTags("div", "class", "row", "");
     var colDiv = createHtmlTags("div", "class", "col-md-3", "");
     mainDiv.append(colDiv);
-
+    var triviaCategory="";
+    if(triviaArray.results.length>=0){
+        triviaCategory = triviaArray.results[0].category;
+    }
+   
     var card = $("<div>");
     card.addClass("card border-primary mb-3");
-    card.attr("style", "max-width: 15rem");
+    card.attr("style", "max-width: 18rem");
 
     var cardHeader = $("<div>");
     cardHeader.addClass("card-header");
-    cardHeader.text("Trivia Game");
+    cardHeader.text("Trivia - "+triviaCategory);
 
     var cardBody = $("<div>");
     cardBody.addClass("card-body text-primary weather-row");
 
+    var cardFooter = $("<div>");
+    cardFooter.addClass("card-footer bg-transparent border-success");
+    var triviaInput = $("<input>");
+    triviaInput.attr("id", "search-trivia");
+    triviaInput.attr("type", "text");
+    triviaInput.attr(palceholder = "Matrix");
+    triviaInput.attr("value", "");
+
+    var triviaSelect = getSelectHtmltag();
+    var triviaSubmitButton = $("<button>");
+    triviaSubmitButton.addClass("btn btn-default")
+    triviaSubmitButton.attr("id", "search");
+    triviaSubmitButton.attr("type", "submit");
+    triviaSubmitButton.text("Search Trivia");
+
+    cardFooter.append(triviaSelect);
     var gameDiv = $("<div>");
     gameDiv.attr("id", "gameDiv")
     gameDiv.show();
@@ -851,8 +885,41 @@ function generateTriviaHTML(response) {
 
     card.append(cardHeader);
     card.append(cardBody);
+    card.append(cardFooter);
+
 
     return card;
+}
+
+function getSelectHtmltag(){
+
+    //
+    
+var triviaCategory = [
+    {catCode: "9",catName: "General Knowlwdge"},{catCode: "10",catName: "Entertainment: Books"},{catCode: "11",catName: "Entertainment: Film"},
+    {catCode: "12",catName: "Entertainment: Music"},{catCode: "13",catName: "Entertain: Musical & Theaters"},{catCode: "14",catName: "Entertainment: Television"},
+    {catCode: "15",catName: "Entertainment: Video Games"},{catCode: "16",catName: "Entertain: Board Games"},{catCode: "17",catName: "Science & Nature"},
+    {catCode: "18",catName: "Science: Computers"},{catCode: "19",catName: "Science: Mathematics"},{catCode: "20",catName: "Mythology"},
+    {catCode: "21",catName: "Sports"},{catCode: "22",catName: "Geography"},{catCode: "23",catName: "History"},
+    {catCode: "24",catName: "Politics"},{catCode: "25",catName: "Art"},{catCode: "26",catName: "Celebrities"},{catCode: "27",catName: "Animals"}
+];
+    
+    //
+  
+    var triviaOptions = [];
+    var triviaSelect = $("<select>");
+    triviaSelect.attr("id", "triviaSearch");
+  
+    for (var i = 0; i < triviaCategory.length; i++) {
+      
+        var categoryName ="";
+        categoryName = triviaCategory[i].catName;
+        triviaOptions[i] = $("<option>");
+        triviaOptions[i].attr("value", triviaCategory[i].catCode);
+        triviaOptions[i].text(categoryName);
+        triviaSelect.append(triviaOptions[i]);
+    }
+    return triviaSelect
 }
 
 //Load next quiz called at START START OVER and get next quiz
@@ -981,6 +1048,17 @@ function createHtmlTags(elemnt, attributeType, attributeValue, innerHtmlVal) {
     return newHtmlTag;
 }
 
+
+function searchTriviaEventistner() {
+    $("body").on("change", "#triviaSearch", function () {
+        correctAnswers = 0;
+        inCorrectAnswers = 0;
+        question_number = 0;
+        var catg = $("#triviaSearch").val();
+        triviaWidget(catg);
+  });
+}
+
 function reStartClickedEventListner() {
     $("body").on("click", "#reStartGame", function () {
         correctAnswers = 0;
@@ -1004,6 +1082,91 @@ function displayTriviaWidget(triviaWidgetHtml) {
     $("#trivia").html(triviaWidgetHtml);
     loadNextQuiz();
 }
+
+
+// Movie Widget
+function movieWidget(movie) {
+    var apikey = "trilogy";
+    var newMovie = "Tag";
+    if (movie) {
+        newMovie = movie;
+    }
+    var queryUrl = "https://www.omdbapi.com/?t=" + newMovie + "&y=&plot=short&page=1&apikey=trilogy";
+    getData(queryUrl, generateMovieWidgetHtml, displayMovieWidget);
+}
+
+function generateMovieWidgetHtml(response) {
+    var newactors = response.Actors;
+    var newmoviename = response.Title;
+    var poster = response.Poster;
+    var posterImg = $("<img>");
+    posterImg.attr("src", poster);
+    $(".poster").append(posterImg);
+    $("#movie-input").text(newmoviename);
+    $(".actors").text("Actors :" + newactors);
+    var rating = [];
+    rating = response.Ratings;
+
+    var card = $("<div>");
+    card.addClass("card border-success xs-3");
+    card.attr("style", "max-width: 18rem");
+
+    var cardHeader = $("<div>");
+    cardHeader.addClass("card-header");
+
+    cardHeader.text("Movie: " + newmoviename);
+    var cardBody = $("<div>");
+    cardBody.addClass("card-body text-primary movier-row");
+
+    var cardBodyMovieInfoDiv = $("<div>");
+    cardBodyMovieInfoDiv.addClass("movie-col");
+    cardBodyMovieInfoDiv.append($("<p>").addClass("").text("Actors: "));
+    cardBodyMovieInfoDiv.append($("<p>").addClass("").text(newactors));
+    cardBodyMovieInfoDiv.append($("<p>").addClass("rating").text("Ratings :"));
+
+
+    for (var i = 0; i < rating.length; i++) {
+        cardBodyMovieInfoDiv.append($("<p>").addClass("temp").text(rating[i].Source + ": " + rating[i].Value));
+    }
+    cardBody.append(cardBodyMovieInfoDiv);
+    cardBody.append(posterImg);
+
+    var cardFooter = $("<div>");
+    cardFooter.addClass("card-footer bg-transparent border-success");
+    var movieInput = $("<input>");
+    movieInput.attr("id", "search-movie");
+    movieInput.attr("type", "text");
+    movieInput.attr(palceholder = "Matrix");
+    movieInput.attr("value", "");
+
+    var movieSubmitButton = $("<button>");
+    movieSubmitButton.addClass("btn btn-default")
+    movieSubmitButton.attr("id", "search");
+    movieSubmitButton.attr("type", "submit");
+    movieSubmitButton.text("Search Movie");
+
+    cardFooter.append(movieInput);
+    cardFooter.append(movieSubmitButton);
+
+    card.append(cardHeader);
+    card.append(cardBody);
+    card.append(cardFooter);
+    return card;
+}
+
+function displayMovieWidget(movieWidgetHtml) {
+    $("#movie").empty();
+    $("#movie").html(movieWidgetHtml);
+}
+
+function searchMovieEventistner() {
+    $("body").on("click", "#search", function () {
+        var city = $("#search-movie").val();
+        movieWidget(city);
+    });
+}
+
+// Movie Widget end
 
 function getData(queryUrl, generateWidgetHtml, displayWidget) {
     console.log(queryUrl);
