@@ -1,5 +1,5 @@
 var database = null;
-var registeredUserNameArray =[];
+var registeredUserNameArray = [];
 var registeredUserWidgetInfoObject ={};
 var loggedInUsername = "";
 
@@ -14,28 +14,36 @@ var inCorrectAnswers = 0;
 
 
 $(document).ready(function() {
-    emptyLocalStorageForUnAuthenticatedUser();
     // a variable to reference the database
     database = initializeFirebase();
-    deleteDatabaseInfo();
-    saveWidgetStateButtonClickListener();
+
+    getLoggedInUsernameFromLocalStorage(); //set the loggedInUsername variable if a user logged in previously
+    displayLoggedInUserInDropDownButton()
+    emptyLocalStorageForUnAuthenticatedUser();
+
+    clearDatabaseButonListener(); //for firebase debugging
+    clearLocalStorageButtonListener(); //for localstorage debugging
+
     logInClickListener();
+    logOutClickListener();
     registerButtonClickListener();
+    saveWidgetStateButtonClickListener();
+
     updateRegisteredUserNameArray();
     
+    clock();
     clickWidgetButtonListener();
-    clearLocalStorageButtonListener(); //for local storage debugging only
+    clickWidgetListener();
+    generateWidgetFromLocalStorage();
+    smoothScrolling(); //for smooth scrolling when the Google Maps widget button is clicked
+
     resizableDivListener();
     newsCategoryButtonClickListener();
     cryptocurrencyRefreshButtonListener();
-    generateWidgetFromLocalStorage();
-    clickWidgetListener();
     searchCityWeatherEventListner();
     reStartClickedEventListner();
-    clock();
     YTbuttonClickListener(); 
     gifListener();
-    smoothScrolling(); //for smooth scrolling when the Google Maps widget button is clicked
     addToDoBtnClickListener();
     taskBtnClassClickListener();
 });
@@ -85,6 +93,30 @@ function smoothScrolling() {
 function emptyLocalStorageForUnAuthenticatedUser() {
     if (!loggedInUsername) {
         localStorage.clear();
+    } else {
+        if ("No preference set yet" === registeredUserWidgetInfoObject[loggedInUsername]) {
+            clearWidgetInfoObjectFromLocalStorage();
+        }
+    }
+}
+
+function setLoggedInUsernameToLocalStorage(username) {
+    if (username) {
+        loggedInUsername = username;
+        localStorage.setItem("loggedInUsername", loggedInUsername);
+    }
+}
+
+function getLoggedInUsernameFromLocalStorage() {
+    if (localStorage.getItem("loggedInUsername")) {
+        loggedInUsername =  localStorage.getItem("loggedInUsername");
+    }
+}
+
+function resetLoggedInUsernameToLocalStorage() {
+    if (localStorage.getItem("loggedInUsername")) {
+        localStorage.removeItem("loggedInUsername");
+        loggedInUsername = "";
     }
 }
 
@@ -126,32 +158,77 @@ function logInClickListener() {
         var username = $("#log-in-username").val();
         if (!isUsernameValid(username)) {
             displayFeedback("log-in-feedback-div", "Please enter a valid username that must be non-empty strings and can't contain \".\", \"#\", \"$\", \"[\", or \"]\"");
+            setTimeout(function() {
+                displayFeedback("log-in-feedback-div", "");
+            }, 3 * 1000);
         } else if (isUsernameUnique(username)) {
             displayFeedback("log-in-feedback-div", "The username " + username + " is not registered yet");
-
-        }
-        else {
-            loggedInUsername = username;
-            console.log("inside else: ");
+            setTimeout(function() {
+                displayFeedback("log-in-feedback-div", "");
+            }, 3 * 1000);
+        } else if (loggedInUsername) {
+            console.log("inside else if loggedInUsername", loggedInUsername);
+            displayFeedback("log-in-feedback-div", "Currently " + loggedInUsername + " is logged in. Please log out first before logging in as a different user");
+            setTimeout(function() {
+                displayFeedback("log-in-feedback-div", "");
+            }, 3 * 1000);
+        } else {
+            setLoggedInUsernameToLocalStorage(username);
             if ("No preference set yet" !== registeredUserWidgetInfoObject[loggedInUsername]) {
                 setWidgetInfoToLocalStorage(registeredUserWidgetInfoObject[loggedInUsername]);
                 generateWidgetFromLocalStorage();
             }
-            $("#log-in-modal").modal('hide');
-            displayLoggedInUserInDropDownButton();
-            // displayFeedback("Welcome back " + loggedInUsername + "! You widgets are now displayed!");
-            // setTimeout(displayFeedback, 10 * 1000);
+            displayFeedback("log-in-feedback-div", "Welcome back " + loggedInUsername + "! You saved widgets are now displayed!");
+            setTimeout(function() {
+                displayFeedback("log-in-feedback-div", "");
+                hideModal("log-in-modal");
+            }, 3 * 1000);
         }
         $("#log-in-username").val("");
-        displayFeedback("log-in-feedback-div", "");
-        // database.ref().child("users").remove();
+        displayLoggedInUserInDropDownButton();
     });   
 }
 
 function displayLoggedInUserInDropDownButton() {
-    $("#dropdownMenuButton").text(loggedInUsername);
-    $("#dropdownMenuButton").removeClass("btn-secondary");
-    $("#dropdownMenuButton").addClass("btn-success");
+    if (loggedInUsername) {
+        $("#dropdownMenuButton").text(loggedInUsername);
+        $("#dropdownMenuButton").removeClass("btn-secondary");
+        $("#dropdownMenuButton").addClass("btn-success");
+    }else {
+        $("#dropdownMenuButton").text("Not Logged In");
+        $("#dropdownMenuButton").addClass("btn-secondary");
+        $("#dropdownMenuButton").removeClass("btn-success");
+    }
+}
+
+function logOutClickListener() {
+    $("#log-out-button").on("click", function() {
+        event.preventDefault();
+        if (loggedInUsername) {
+            var username = loggedInUsername;
+            resetLoggedInUsernameToLocalStorage();
+            clearWidgetInfoObjectFromLocalStorage();
+            generateWidgetFromLocalStorage();
+            displayFeedback("log-out-feedback-div", "The username " + username + " has been logged out");
+            setTimeout(function() {
+                displayFeedback("log-out-feedback-div", "");
+                hideModal("log-out-modal");
+            }, 3 * 1000);
+        }
+        else {
+            displayFeedback("log-out-feedback-div", "There's no logged in user. Log out failed.");
+            setTimeout(function() {
+                displayFeedback("log-out-feedback-div", "");
+                hideModal("log-out-modal");
+            }, 3 * 1000);
+            
+        }
+        displayLoggedInUserInDropDownButton();
+    });   
+}
+
+function hideModal(modalId) {
+    $("#" + modalId).modal('hide');
 }
 
 function registerButtonClickListener() {
@@ -159,19 +236,25 @@ function registerButtonClickListener() {
         event.preventDefault();
         var username = $("#register-username").val();
         if (!isUsernameValid(username)) {
-            displayFeedback("register-feedback-div", "Please enter a valid username that must be non-empty strings and can't contain \".\", \"#\", \"$\", \"[\", or \"]\"");
+            displayFeedback("register-feedback-div", "Please enter a valid username that must be a non-empty string and can't contain \".\", \"#\", \"$\", \"[\", or \"]\"");
+            setTimeout(function() {
+                displayFeedback("register-feedback-div", "");
+            }, 3 * 1000);
         } else if (!isUsernameUnique(username)) {
             displayFeedback("register-feedback-div", "The username " + username + " is already registered");
+           setTimeout(function() {
+                displayFeedback("register-feedback-div", "");
+            }, 3 * 1000);
         }
         else {
             registerUsername(username);
             displayFeedback("register-feedback-div", "Registered the username: " + username);
-            setTimeout(displayFeedback, 3 * 1000, "register-feedback-div");
-            $("#register-modal").modal('hide');
+            setTimeout(function() {
+                displayFeedback("register-feedback-div", "");
+                hideModal("register-modal");
+            }, 3 * 1000);
         }
         $("#register-username").val("");
-        displayFeedback("register-feedback-div", "");
-        // database.ref().child("users").remove();
     });   
 }
 
@@ -228,7 +311,8 @@ function displayFeedback(feedbackDivId, message) {
         $("#" + feedbackDivId).text("");
     }
 }
-function deleteDatabaseInfo() {
+
+function clearDatabaseButonListener() {
     $("#clear-database-button").on("click", function() {
         // database.ref().child("users").remove();
         database.ref().remove();
@@ -330,6 +414,12 @@ function clearLocalStorageButtonListener() {
     });
 }
 
+function clearWidgetInfoObjectFromLocalStorage() {
+    if (localStorage.getItem("widgetInfoObject")) {
+        localStorage.removeItem("widgetInfoObject");
+    }
+}
+
 function getWidgetInfoFromLocalStorage() {
     if (localStorage.getItem("widgetInfoObject")) {
         return JSON.parse(localStorage.getItem("widgetInfoObject"));
@@ -361,12 +451,20 @@ function updateWidgetInfoToLocalStorage(update, widgetName) {
 
 function generateWidgetFromLocalStorage() {
     var widgetInfoObject = getWidgetInfoFromLocalStorage();
-    $.each(widgetInfoObject, function(widgetName, widgetInfo){
-        generateAndDisplayWidgetContainer(widgetName);
-        var addWidgetToLocalStorage = false; //false because the widget already exists in local storage
-        generateAndDisplayWidget(widgetName, addWidgetToLocalStorage);
-        updateWidgetHtmlAttributes(widgetName, widgetInfo);
-    });
+    if ($.isEmptyObject(widgetInfoObject)) {
+        displayEmptyDashboard();
+    } else {
+        $.each(widgetInfoObject, function(widgetName, widgetInfo){
+            generateAndDisplayWidgetContainer(widgetName);
+            var addWidgetToLocalStorage = false; //false because the widget already exists in local storage
+            generateAndDisplayWidget(widgetName, addWidgetToLocalStorage);
+            updateWidgetHtmlAttributes(widgetName, widgetInfo);
+        });
+    }
+}
+
+function displayEmptyDashboard() {
+    $("#dashboard").empty();
 }
 
 function updateWidgetHtmlAttributes(widgetName, widgetInfo) {
@@ -433,7 +531,6 @@ function removeToDoFunction() {
     toDoListWidget();
 
 }
-
 
 function newsCategoryButtonClickListener() {
     $(document).on("click", ".newsButtonClass", newsWidget);

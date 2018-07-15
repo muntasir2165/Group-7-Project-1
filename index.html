@@ -38,6 +38,7 @@
 		<div class="container">
 
 			<div class="row">
+				
 				<div class="col-md-2" id="log-in-info">
 					<div class="dropdown">
 						<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -45,15 +46,19 @@
 						</button>
 						<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 							<a class="dropdown-item" data-toggle="modal" href="#log-in-modal">Log In</a>
+							<a class="dropdown-item" data-toggle="modal" href="#log-out-modal">Log Out</a>
 							<a class="dropdown-item" data-toggle="modal" href="#register-modal">Register</a>
 							<a class="dropdown-item" data-toggle="modal" href="#save-widget-state-modal">Save Widget State</a>
 						</div>
 					</div>
 				</div>
+
 				<div class="col-md-5 offset-md-5" id="clock"></div>
+
 			</div>
 
 			<div class="row m-3">
+
 		  		<div class="col-md-10 offset-md-1 offset-md-right-1">
 		    		<div class="widget-btn btn m-1" data-widget="weather"><img class="widget-image" id="weatherImg" src="assets/images/weather.png" alt="Weather Image"></div>
 		    		<div class="widget-btn btn m-1" data-widget="news"><img class="widget-image" id="newsImg" src="assets/images/news.png" alt="News Image"></div>
@@ -64,6 +69,7 @@
 		    		<a href="#googleMaps"><div class="widget-btn btn m-1" data-widget="googleMaps"><img class="widget-image" id="googleMapsImage" src="assets/images/google-maps.png" alt="Google Maps Image"></div></a>
 		    		<div class="widget-btn btn m-1" data-widget="toDoList"><img class="widget-image" id="toDoListImage" src="assets/images/toDoList.png" alt="To Do List Image"></div>
 		    	</div>
+
 			</div>
 
 			<div class="row" id="google-search-bar">
@@ -78,6 +84,7 @@
 					</form>
 					<div id="feedback-div"></div>
 				</div> -->
+
 				<div class="col-md-8 offset-md-2 offset-md-right-2">
 					<script>
 		    			(function() {
@@ -92,13 +99,16 @@
 					</script>
 					<gcse:search enableAutoComplete="true"></gcse:search>
 				</div>
+
 			</div>	
 			
 			<div class="row">
+
 				<div class="col-md-6 offset-md-3 offset-md-right-3 mt-3 mb-3">
 					<div id="clear-localstorage-button" class="btn btn-danger">Clear Local Storage</div>
 					<div id="clear-database-button" class="btn btn-danger">Clear Firebase</div>
 				</div>
+
 			</div>
 
 			<div class="row">
@@ -107,12 +117,14 @@
 			</div>	
 
 			<div class="row" id="googleMaps">
+
 				<div class="col-md-12 border">
 					<div>
 						<input id="pac-input" class="controls" type="text" placeholder="Search Box">
 			    		<div id="map"></div>
 					</div>
 				</div>
+
 			</div>
 
 		</div>
@@ -235,6 +247,31 @@
 					<button id="log-in-button" type="submit" class="btn btn-success m-1">Log In</button>
 				</form>
 				<div id="log-in-feedback-div"></div>
+		      </div>
+
+	<!-- 	      <div class="modal-footer">
+		        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+		      </div> -->
+
+		    </div>
+		  </div>
+		</div>
+
+		<!-- The Log Out Modal -->
+		<div class="modal fade" id="log-out-modal">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+
+		      <div class="modal-header">
+		        <h4 class="modal-title">Log Out?</h4>
+		        <button type="button" class="close" data-dismiss="modal">&times;</button>
+		      </div>
+
+		      <div class="modal-body">
+		        <form>
+					<button id="log-out-button" type="submit" class="btn btn-danger m-1">Yes</button>
+				</form>
+				<div id="log-out-feedback-div"></div>
 		      </div>
 
 	<!-- 	      <div class="modal-footer">
