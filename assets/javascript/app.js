@@ -3,6 +3,13 @@ var registeredUserNameArray =[];
 var registeredUserWidgetInfoObject ={};
 var authenticatedUsername = "";
 
+// global variables for the trivia widget
+var question_number = 0;
+var triviaArray = [];
+var correctAnswers = 0;
+var inCorrectAnswers = 0;
+
+
 $(document).ready(function() {
     emptyLocalStorageForUnAuthenticatedUser();
     // a variable to reference the database
@@ -136,19 +143,6 @@ function isUsernameUnique(username) {
     return true;
 }
 
-// function getUserNameListing() {
-//     database.ref().once("value", function(snapshot) {
-//         console.log("inside getUserNameListing()");
-//         registeredUserNameArray = [];
-//         if (snapshot.val() && snapshot.val()["users"]) {
-//             jQuery.each(snapshot.val()["users"], function(username, value) {
-//                 registeredUserNameArray.push(username);
-//             });
-//             console.log("registeredUserNameArray: " + registeredUserNameArray);
-//         }
-//     });
-// }
-
 function updateRegisteredUserNameArray() {
     database.ref().on("value", function(snapshot) {
         console.log("inside updateRegisteredUserNameArray()");
@@ -191,14 +185,18 @@ function clock() {
 function clickWidgetButtonListener() {
     $(document).on("click", ".widget-btn", function() {
         var widgetName = $(this).attr("data-widget");
-        if ($("#" + widgetName).length !== 0){
-            $("#" + widgetName).remove();
-            console.log("The " + widgetName+ " has been removed from the screen");
-            updateWidgetInfoToLocalStorage("remove", widgetName);
-        } else {
-            generateAndDisplayWidgetContainer(widgetName);
-            var addWidgetToLocalStorage = true;
-            generateAndDisplayWidget(widgetName, addWidgetToLocalStorage);
+        // google maps is the one widget that doesn't display on the dashboard but appear on a div
+        // below it and so, widget related functions calls don't apply to it
+        if (widgetName !== "googleMaps") {
+            if ($("#" + widgetName).length !== 0){
+                $("#" + widgetName).remove();
+                console.log("The " + widgetName+ " has been removed from the screen");
+                updateWidgetInfoToLocalStorage("remove", widgetName);
+            } else {
+                generateAndDisplayWidgetContainer(widgetName);
+                var addWidgetToLocalStorage = true;
+                generateAndDisplayWidget(widgetName, addWidgetToLocalStorage);
+            }
         }
     });
 }
@@ -207,7 +205,6 @@ function generateAndDisplayWidgetContainer(widgetName) {
     var dashboard = $("#dashboard");
     var widgetDiv = $("<div>");
     widgetDiv.addClass("resize-drag");
-    // widgetDiv.addClass("draggable");
     widgetDiv.text(widgetName); //for debugging purposes only
     widgetDiv.attr("id", widgetName);
     dashboard.append(widgetDiv);
@@ -244,9 +241,6 @@ function generateAndDisplayWidget(widgetName, addWidgetToLocalStorage) {
             if (addWidgetToLocalStorage) {
                 updateWidgetInfoToLocalStorage("add", widgetName);
             }
-            break;
-        case "google-maps":
-            console.log("google-maps");
             break; 
         case "gif": 
             gifWidget(); 
@@ -603,11 +597,6 @@ function triviaWidget() {
     getData("https://opentdb.com/api.php?amount=10", generateTriviaHTML, displayTriviaWidget);
 }
 
-var question_number = 0;
-var triviaArray = [];
-var correctAnswers = 0;
-var inCorrectAnswers = 0;
-
 function generateTriviaHTML(response) {
     triviaArray = response;
     var mainDiv = createHtmlTags("div", "class", "row", "");
@@ -811,36 +800,6 @@ function getData(queryUrl, generateWidgetHtml, displayWidget) {
         }
     });
 }
-
-// function draggableDivListener() {
-//     // target elements with the "draggable" class
-//     interact('.draggable')
-//     .draggable({
-//         // enable inertial throwing
-//         inertia: true,
-//         // keep the element within the area of it's parent
-//         restrict: {
-//             restriction: "parent",
-//             endOnly: true,
-//             elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
-//         },
-//         // enable autoScroll
-//         autoScroll: true,
-
-//         // call this function on every dragmove event
-//         onmove: dragMoveListener,
-//         // call this function on every dragend event
-//         onend: function (event) {
-//             var textEl = event.target.querySelector('p');
-
-//             textEl && (textEl.textContent =
-//                 'moved a distance of '
-//                 + (Math.sqrt(Math.pow(event.pageX - event.x0, 2) +
-//                     Math.pow(event.pageY - event.y0, 2) | 0))
-//                 .toFixed(2) + 'px');
-//         }
-//     });
-// }
 
 function dragMoveListener (event) {
     var target = event.target,
