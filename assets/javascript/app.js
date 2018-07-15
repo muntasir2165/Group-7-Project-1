@@ -137,7 +137,7 @@ function saveWidgetStateButtonClickListener() {
     $("#save-widget-state-button").on("click", function() {
         event.preventDefault();
         if (!loggedInUsername) {
-            displayFeedback("save-widget-state-feedback-div", "You have not registered and/or authenticated yet");
+            displayFeedback("save-widget-state-feedback-div", "You have not registered and/or logged in yet");
         } else {
             saveUserWidgetInfoToDatabase(loggedInUsername);
             displayFeedback("save-widget-state-feedback-div", "Saved widget information");
