@@ -613,13 +613,16 @@ function cryptocurrencyRefreshButtonListener() {
 }
 
 function bitcoinWidget() {
+    $("#bitcoinResults").empty();
     $("#bitcoin").append($("<div>").attr("id", "bitcoinRow"));
     $("#bitcoinRow").addClass("row");
     $("#bitcoinRow").append($("<div>").attr("id", "bitcoinColumn"));
     $("#bitcoinColumn").addClass("col-xs-12");
-    $("#bitcoinColumn").append($("<p>").attr("id", "bitCoinStatement"));
-    $("#bitCoinStatement").append("Current Cryptocurrency Values");
+    // $("#bitcoinColumn").append($("<p>").attr("id", "bitCoinStatement"));
+    // $("#bitCoinStatement").append("Current Cryptocurrency Values");
     $("#bitcoinColumn").append($("<div>").attr("id", "bitcoinResults"));
+    // $("#bitcoinResults").append($("<p>").attr("id", "bitCoinStatement"));
+    // $("#bitCoinStatement").append("Current Cryptocurrency Values");
     
     // API Key for World Coin Index API
     var apikey = "O9zZJm0q0o0XnTTXUWGbkqI5sXdeON&label=ethbtc-ltcbtc&fiat=btc";
@@ -629,7 +632,9 @@ function bitcoinWidget() {
 
 function generateBitcoinWidgetHtml(response) {
     console.log(response);
-    $("#bitcoinResults").empty();
+    // $("#bitcoinResults").empty();
+    $("#bitcoinResults").append($("<p>").attr("id", "bitCoinStatement"));
+    $("#bitCoinStatement").append("Current Cryptocurrency Values");
     var coinResults = response.Markets;
     for (var i = 0; i < coinResults.length; i++) {
         var coinName = coinResults[i].Name;
