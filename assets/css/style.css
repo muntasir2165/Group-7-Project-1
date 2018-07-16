@@ -7,7 +7,8 @@
 
 body {
 	background-color: #464646;
-    color: #000000;
+    /* color: #000000; */
+    color: #404040;
     background-image: url("../images/background2.jpg");
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     background-size: cover;
@@ -17,9 +18,15 @@ body {
     margin-bottom: 24px;
 }
 
-#log-in-info, #clock {
+#log-in-info {
     font-size: 14px;
     color: #ffffff;
+}
+
+#clock {
+    font-size: 16px;
+    font-weight: 600;
+    color:  #ffffff
 }
 
 #log-in-button, #register-button, #save-widget-state-button {
@@ -143,14 +150,15 @@ table.gsc-search-box {
 
 /* Trivia widget styling starts */
 #trivia .card-body{
-    padding: 0;
+    padding: 5px;
 }
 
 #trivia .questions, .answers, #showAnswer, #comment, #correctAnswerComment, #nextQuiz,.allDone,.answerP{
     text-align: center;
     /* font-family: 'Times New Roman', Times, serif; */
     /* font-size: 15px; */
-    color: black;
+    /* color: black; */
+    color: #404040;
     margin-top: 12px;
     margin-bottom: 12px;
 }
@@ -171,7 +179,8 @@ table.gsc-search-box {
    margin-bottom: 10px;
    left: 40px;
    /* font-size: 10px; */
-   color: black;
+   /* color: black; */
+   color: #404040;
    background-color: white
 }
 
@@ -182,7 +191,8 @@ table.gsc-search-box {
     margin-bottom: 10px;
    left: 40px;
    /* font-size: 10px; */
-   color: black;
+   /* color: black; */
+   color: #404040;
    background-color: white;
 }
 
@@ -267,6 +277,7 @@ table.gsc-search-box {
     font-weight: 600;
     text-align: center;
     margin-top: 12px;
+    margin-bottom: 12px;
 }
 
 #bitcoinResults {
@@ -306,6 +317,18 @@ table.gsc-search-box {
     margin: 0;
     padding: 0;
 }*/
+
+.gs-title {
+    text-align: left;
+}
+
+.gsc-control-cse .gs-snippet {
+    margin-left: 7px;
+}
+
+.gs-image-box.gs-web-image-box.gs-web-image-box-portrait, .gs-image-box.gs-web-image-box.gs-web-image-box-landscape {
+    margin-left: 2px;
+}
 
 #googleMapsImage {
     width: 99%;

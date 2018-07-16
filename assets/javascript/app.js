@@ -613,13 +613,16 @@ function cryptocurrencyRefreshButtonListener() {
 }
 
 function bitcoinWidget() {
+    $("#bitcoinResults").empty();
     $("#bitcoin").append($("<div>").attr("id", "bitcoinRow"));
     $("#bitcoinRow").addClass("row");
     $("#bitcoinRow").append($("<div>").attr("id", "bitcoinColumn"));
     $("#bitcoinColumn").addClass("col-xs-12");
-    $("#bitcoinColumn").append($("<p>").attr("id", "bitCoinStatement"));
-    $("#bitCoinStatement").append("Current Cryptocurrency Values");
+    // $("#bitcoinColumn").append($("<p>").attr("id", "bitCoinStatement"));
+    // $("#bitCoinStatement").append("Current Cryptocurrency Values");
     $("#bitcoinColumn").append($("<div>").attr("id", "bitcoinResults"));
+    // $("#bitcoinResults").append($("<p>").attr("id", "bitCoinStatement"));
+    // $("#bitCoinStatement").append("Current Cryptocurrency Values");
     
     // API Key for World Coin Index API
     var apikey = "O9zZJm0q0o0XnTTXUWGbkqI5sXdeON&label=ethbtc-ltcbtc&fiat=btc";
@@ -629,7 +632,9 @@ function bitcoinWidget() {
 
 function generateBitcoinWidgetHtml(response) {
     console.log(response);
-    $("#bitcoinResults").empty();
+    // $("#bitcoinResults").empty();
+    $("#bitcoinResults").append($("<p>").attr("id", "bitCoinStatement"));
+    $("#bitCoinStatement").append("Current Cryptocurrency Values");
     var coinResults = response.Markets;
     for (var i = 0; i < coinResults.length; i++) {
         var coinName = coinResults[i].Name;
@@ -940,7 +945,7 @@ function getSelectHtmltag(){
     //
     
 var triviaCategory = [
-    {catCode: "9",catName: "General Knowlwdge"},{catCode: "10",catName: "Entertainment: Books"},{catCode: "11",catName: "Entertainment: Film"},
+    {catCode: "9",catName: "General Knowledge"},{catCode: "10",catName: "Entertainment: Books"},{catCode: "11",catName: "Entertainment: Film"},
     {catCode: "12",catName: "Entertainment: Music"},{catCode: "13",catName: "Entertain: Musical & Theaters"},{catCode: "14",catName: "Entertainment: Television"},
     {catCode: "15",catName: "Entertainment: Video Games"},{catCode: "16",catName: "Entertain: Board Games"},{catCode: "17",catName: "Science & Nature"},
     {catCode: "18",catName: "Science: Computers"},{catCode: "19",catName: "Science: Mathematics"},{catCode: "20",catName: "Mythology"},
@@ -1000,9 +1005,9 @@ function loadNextQuiz() {
 // Called from OPTIONS selected by user
 function optionsClicked(obj) {
     answerClicked = "true";
-    var answerWrong = "Nope!!";
-    var answerRight = "Correct!!";
-    var answerCorrect = "Correct Answer Is: ";
+    var answerWrong = "Nope!";
+    var answerRight = "Correct!";
+    var answerCorrect = "The correct answer is: ";
     var answerSelected = obj.innerHTML;
     var aCommentH2 = document.createElement("h2");
     aCommentH2.setAttribute("id", "comment");
@@ -1012,7 +1017,7 @@ function optionsClicked(obj) {
     var qCorrectAns = "";
 
     qCorrectAns = triviaArray.results[question_number - 1].correct_answer;
-    aCorrectAnswerH2.innerHTML = answerCorrect + " " + qCorrectAns + "!!";
+    aCorrectAnswerH2.innerHTML = answerCorrect + " " + qCorrectAns + "!";
 
     if (answerSelected === qCorrectAns) {
         correctAnswers += 1;
@@ -1042,7 +1047,7 @@ function loadAnswerDiv(aCommentH2, aCorrectAnswerH2) {
     var aNextButton = document.createElement("button");
     aNextButton.setAttribute("id", "nextQuiz");
     aNextButton.setAttribute("onclick", "getNextQuiz()");
-    aNextButton.innerHTML = "Click Next";
+    aNextButton.innerHTML = "Try Again";
 
     $("#showAnswer").empty();
     aDiv.append(aCommentH2);
