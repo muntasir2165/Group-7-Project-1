@@ -353,7 +353,7 @@ function generateAndDisplayWidgetContainer(widgetName) {
     var dashboard = $("#dashboard");
     var widgetDiv = $("<div>");
     widgetDiv.addClass("resize-drag");
-    widgetDiv.text(widgetName); //for debugging purposes only
+    // widgetDiv.text(widgetName); //for debugging purposes only
     widgetDiv.attr("id", widgetName);
     dashboard.append(widgetDiv);
 }
@@ -510,6 +510,8 @@ function createToDoInput() {
     $("#toDoRow").addClass("row");
     $("#toDoRow").append($("<div>").attr("id", "toDoColumn"));
     $("#toDoColumn").addClass("col-xs-12");
+    $("#toDoColumn").append($("<p>").attr("id", "toDoStatement"));
+    $("#toDoStatement").append("My To-Do List");
     $("#toDoColumn").append($("<form>").attr("id", "toDoForm"));
     $("#toDoForm").append($("<input>").attr("id", "toDoInput"));
     $("#toDoInput").attr("type", "text");
@@ -530,14 +532,17 @@ function taskBtnClassClickListener() {
 function addToDoFunction() {
     event.preventDefault();
     var task = $("#toDoInput").val().trim();
-    toDoArray.push(task);
-    console.log("The task is: " + task);
-    console.log(toDoArray)
-    toDoListWidget();
+    if (task != "") {
+        toDoArray.push(task);
+        console.log("The task is: " + task);
+        console.log(toDoArray)
+        toDoListWidget();
+    }
 }
 
 function toDoListWidget() {
     $("#toDoLog").empty();
+    $("#toDoInput").val("");
     for (i = 0; i < toDoArray.length; i++) {
         var taskDiv = $("<div>").append(toDoArray[i]);
         taskDiv.attr("data-task", toDoArray[i])
@@ -573,6 +578,8 @@ function createNewsButtons() {
     $("#newsRow").addClass("row");
     $("#newsRow").append($("<div>").attr("id", "newsColumn"));
     $("#newsColumn").addClass("col-xs-12");
+    $("#newsColumn").append($("<p>").attr("id", "newsStatement"));
+    $("#newsStatement").append("Top Headlines in Canada");
     var newsCategories = ["entertainment", "general", "health", "sports", "business", "technology"];
     for (var i = 0; i < newsCategories.length; i++) {
         var newsBtn = $("<button>").attr("data-newsType", newsCategories[i]);
@@ -610,6 +617,8 @@ function bitcoinWidget() {
     $("#bitcoinRow").addClass("row");
     $("#bitcoinRow").append($("<div>").attr("id", "bitcoinColumn"));
     $("#bitcoinColumn").addClass("col-xs-12");
+    $("#bitcoinColumn").append($("<p>").attr("id", "bitCoinStatement"));
+    $("#bitCoinStatement").append("Current Cryptocurrency Values");
     $("#bitcoinColumn").append($("<div>").attr("id", "bitcoinResults"));
     
     // API Key for World Coin Index API
@@ -705,7 +714,7 @@ function generateWeatherWidgetHtml(response) {
     citySubmitButton.addClass("btn btn-default")
     citySubmitButton.attr("id","search");
     citySubmitButton.attr("type","submit");
-    citySubmitButton.text("Submit");
+    citySubmitButton.text("Search for a City");
     
     cardFooter.append(cityInput);
     cardFooter.append(citySubmitButton);
@@ -750,7 +759,10 @@ function generateNewsWidgetHtml(response) {
 function YTbuttonClickListener() {
     $(document).on("click", "#YTbutton",function() {
         event.preventDefault();
-        youTubeCreation();
+        var newTopic = $("#youTubeInput").val().trim();
+        if (newTopic != "") {
+            youTubeCreation();
+        }
     });
 }
 
@@ -781,13 +793,15 @@ function youTubeWidget() {
   
 function youTubeCreation() {
     console.log("Hi");
-    var newTopic = $("#youTubeInput").val();
+    var newTopic = $("#youTubeInput").val().trim();
     var apiKey = "AIzaSyAYqrc7twpW4gYFibHNmf7dHCx3AHsBRqM";
     var queryUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=" + newTopic + "&key=" + apiKey;
     getData(queryUrl, generateYouTubeWidgetHtml, displayYouTubeWidget);
+    
 }
 
 function generateYouTubeWidgetHtml(response) {
+    $("#youTubeInput").val("");
     $("#allVideos").empty(); 
     for (var i = 1; i < 5; i++) {
         console.log(response);
@@ -830,10 +844,13 @@ function generateGifWidgetHtml(response) {
     var gifContainer = $("<div>").addClass("row");
     var gifSubContainer = $("<div>").addClass("col-xs-12");
 
+    var gifStatement = $("<p>").attr("id", "gifStatement");
+    gifStatement.text("Random GIF");
+
     var theGif = $("<img>").addClass("the-gif");
     theGif.attr("src", response.data.images.fixed_width.url);
 
-    gifSubContainer.html(theGif);
+    gifSubContainer.append(gifStatement, theGif);
     gifContainer.append(gifSubContainer);
     $("#gif").append(gifContainer);
 
@@ -1146,7 +1163,7 @@ function generateMovieWidgetHtml(response) {
     cardBodyMovieInfoDiv.addClass("movie-col");
     cardBodyMovieInfoDiv.append($("<p>").addClass("").text("Actors: "));
     cardBodyMovieInfoDiv.append($("<p>").addClass("").text(newactors));
-    cardBodyMovieInfoDiv.append($("<p>").addClass("rating").text("Ratings :"));
+    cardBodyMovieInfoDiv.append($("<p>").addClass("rating").text("Ratings: "));
 
 
     for (var i = 0; i < rating.length; i++) {
@@ -1167,7 +1184,7 @@ function generateMovieWidgetHtml(response) {
     movieSubmitButton.addClass("btn btn-default")
     movieSubmitButton.attr("id", "search");
     movieSubmitButton.attr("type", "submit");
-    movieSubmitButton.text("Search Movie");
+    movieSubmitButton.text("Search for a Movie");
 
     cardFooter.append(movieInput);
     cardFooter.append(movieSubmitButton);
