@@ -821,7 +821,7 @@ function gifListener() {
 
 function gifWidget() {
     var apikey = "AGOnLXwDOWiIu3oC7OMWNFsQCMAElFt4"
-    var queryUrl = "http://api.giphy.com/v1/gifs/random?api_key=" + apikey+ "&limit=1";
+    var queryUrl = "https://api.giphy.com/v1/gifs/random?api_key=" + apikey+ "&limit=1";
     getData(queryUrl, generateGifWidgetHtml, displayGifWidget); 
 }
 
