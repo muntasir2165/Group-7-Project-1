@@ -22,6 +22,9 @@ body {
     color: #ffffff;
 }
 
+#log-in-button, #register-button, #save-widget-state-button {
+    background-color: lightseagreen;
+}
 
 #feedback-div {
     color: #ffffff;
@@ -132,7 +135,6 @@ table.gsc-search-box {
     border-radius: 10px;
     margin-top: 12px;
     margin-bottom: 7px;
-    /* overflow: -webkit-paged-x; */
 }
 
 /*input {
