@@ -159,18 +159,18 @@ function logInClickListener() {
         event.preventDefault();
         var username = $("#log-in-username").val();
         if (!isUsernameValid(username)) {
-            displayFeedback("log-in-feedback-div", "Please enter a valid username that must be non-empty strings and can't contain \".\", \"#\", \"$\", \"[\", or \"]\"");
+            displayFeedback("log-in-feedback-div", "Please enter a valid username without any special characters.  It cannot contain \".\", \"#\", \"$\", \"[\", or \"]\"");
             setTimeout(function() {
                 displayFeedback("log-in-feedback-div", "");
             }, 2 * 1000);
         } else if (isUsernameUnique(username)) {
-            displayFeedback("log-in-feedback-div", "The username " + username + " is not registered yet");
+            displayFeedback("log-in-feedback-div", "The username " + username + " has not registered yet");
             setTimeout(function() {
                 displayFeedback("log-in-feedback-div", "");
             }, 2 * 1000);
         } else if (loggedInUsername) {
             console.log("inside else if loggedInUsername", loggedInUsername);
-            displayFeedback("log-in-feedback-div", "Currently " + loggedInUsername + " is logged in. Please log out first before logging in as a different user");
+            displayFeedback("log-in-feedback-div", "Currently, " + loggedInUsername + " is logged in. Please log out first before logging in as a different user.");
             setTimeout(function() {
                 displayFeedback("log-in-feedback-div", "");
             }, 2 * 1000);
@@ -183,7 +183,7 @@ function logInClickListener() {
                 displayEmptyDashboard();
                 clearWidgetInfoObjectFromLocalStorage();
             }
-            displayFeedback("log-in-feedback-div", "Welcome back " + loggedInUsername + "! You saved widgets are now displayed!");
+            displayFeedback("log-in-feedback-div", "Welcome back " + loggedInUsername + "! Your saved widgets are now displayed!");
             setTimeout(function() {
                 displayFeedback("log-in-feedback-div", "");
                 hideModal("log-in-modal");
@@ -221,7 +221,7 @@ function logOutClickListener() {
             }, 2 * 1000);
         }
         else {
-            displayFeedback("log-out-feedback-div", "There's no logged in user. Log out failed.");
+            displayFeedback("log-out-feedback-div", "A user is not logged in. The log out has failed.");
             setTimeout(function() {
                 displayFeedback("log-out-feedback-div", "");
                 hideModal("log-out-modal");
@@ -241,7 +241,7 @@ function registerButtonClickListener() {
         event.preventDefault();
         var username = $("#register-username").val();
         if (!isUsernameValid(username)) {
-            displayFeedback("register-feedback-div", "Please enter a valid username that must be a non-empty string and can't contain \".\", \"#\", \"$\", \"[\", or \"]\"");
+            displayFeedback("register-feedback-div", "Please enter a valid username without any special characters.  It can't contain \".\", \"#\", \"$\", \"[\", or \"]\"");
             setTimeout(function() {
                 displayFeedback("register-feedback-div", "");
             }, 2 * 1000);
