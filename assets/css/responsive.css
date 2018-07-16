@@ -1,0 +1,25 @@
+@media only screen and (max-width: 1200px) {
+    #dashboard {
+        overflow: -webkit-paged-x;
+    }
+}
+
+@media only screen and (max-width: 780px) {
+    #dropdownMenuButton {
+        margin-bottom: 12px;
+    }
+}
+
+@media only screen and (max-width: 353px) {
+    #clear-localstorage-button {
+        margin-bottom: 12px;
+    }
+}
+
+@media only screen and (max-width: 700px) {
+    #dashboard {
+        min-width: 100px; 
+    }
+}
+
+

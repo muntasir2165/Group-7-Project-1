@@ -9,7 +9,8 @@ body {
 	background-color: #464646;
     color: #000000;
     background-image: url("../images/background2.jpg");
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    background-size: cover;
 }
 
 .container {
@@ -20,6 +21,7 @@ body {
     font-size: 14px;
     color: #ffffff;
 }
+
 
 #feedback-div {
     color: #ffffff;
@@ -65,8 +67,8 @@ img.widget-image {
 
 #tubeImage {
     width: 97%;
-    margin-top: 0.5%;
-    margin-right: 1%;
+    margin-top: 0.7%;
+    margin-left: 1%;
 }
 
 #triviaImg {
@@ -75,7 +77,14 @@ img.widget-image {
 
 
 #movieImg {
-    width: 100%;
+    width: 93%;
+    margin-top: 3px;
+    margin-right: 2px;
+}
+
+#toDoListImg {
+    width: 99%;
+    margin-right: 1px;
 }
 
 #google-search-bar {
@@ -99,6 +108,12 @@ table.gsc-search-box {
     border-radius: 9px;
 }
 
+#clear-database-button {
+    border: 1px solid #d6202c;
+    border-radius: 9px;
+    background-color: #d6202c;
+}
+
 .draggable, .resize-drag {
 /*    max-height: 64px;
     max-width: 64px;*/
@@ -115,6 +130,9 @@ table.gsc-search-box {
     min-width: 480px;
     background-color: rgba(139,187,171,0.5);
     border-radius: 10px;
+    margin-top: 12px;
+    margin-bottom: 7px;
+    /* overflow: -webkit-paged-x; */
 }
 
 /*input {
@@ -220,8 +238,13 @@ table.gsc-search-box {
 /* Weather widget sytling ends */
 
 #news {
-    overflow: scroll;
+    overflow: overlay;
     padding: 7px;
+}
+
+#newsStatement {
+    font-weight: 600;
+    margin-bottom: 12px;
 }
 
 #newsColumn {
@@ -234,17 +257,22 @@ table.gsc-search-box {
 }
 
 #bitcoin {
-    overflow: scroll;
+    overflow: overlay;
     padding: 7px;
 }
 
+#bitCoinStatement {
+    font-weight: 600;
+    text-align: center;
+    margin-top: 12px;
+}
+
 #bitcoinResults {
-   margin-left: 30px;
    margin-top: 12px;
 }
 
 #youtube {
-    overflow: scroll;
+    overflow: overlay;
     padding: 7px;
 }
 
@@ -266,6 +294,9 @@ table.gsc-search-box {
        * element that contains the map. */
 #map {
     height: 400px;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    margin-top: 12px;
 }
 /* Optional: Makes the sample page fill the window. */
 /*html, body {
@@ -273,6 +304,11 @@ table.gsc-search-box {
     margin: 0;
     padding: 0;
 }*/
+
+#googleMapsImage {
+    width: 99%;
+    margin-right: 2px;
+}
 
 #description {
     font-family: Roboto;
@@ -376,5 +412,41 @@ table.gsc-search-box {
 
 #movie .rating{
     margin-top: 5px;
+}
+
+#gif {
+    text-align: center;
+    width: 220px;
+    padding: 10px;
+    overflow: overlay;
+}
+
+#gifStatement {
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+#toDoList {
+    overflow: overlay;
+    text-align: center;
+    padding: 7px;
+}
+
+#toDoStatement {
+    margin-top: 12px;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+#addToDoBtn {
+    margin-top: 12px;
+}
+
+#toDoLog {
+    text-align: left;
+}
+
+#dropdownMenuButton {
+    background-color: lightseagreen;
 }
 /* Movie Widget Styling */
