@@ -1,6 +1,10 @@
 # Group-7-Project-1
 
 ![Alt Text](https://media.giphy.com/media/7E2E4X0sbo3LdHuf69/giphy.gif)
+
+
+
+
 Problems for app to solve: 
 
 Having useful information in a central hub
@@ -39,8 +43,9 @@ Entertainment Apps:
 
 Trivia 
 YouTube
-Gif
+Giphy
 News
+IMDb
 
 Frameworks and Libraries Used
 
