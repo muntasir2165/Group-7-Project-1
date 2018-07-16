@@ -388,9 +388,10 @@ table.gsc-search-box {
 
 /* Movie Widget Styling */
 #movie img{
-    width: 200px;
+    width: 100%;
     height:  200px;
     vertical-align: top;
+    margin-top: 12px;
 }
 
 #movie {
@@ -402,11 +403,26 @@ table.gsc-search-box {
     margin-top: 12px;
     background-color: lightgray;
 }
+
+.card-header {
+    font-weight: 600;
+}
 #movie .movie-col {
     display: flex;
     flex-direction: column;
     margin-left: 0px;
     padding: 7px;
+    font-size: 14px;
+}
+
+
+.rating {
+    font-size: 16px;
+    font-weight: 600;
+}
+.actors {
+    font-size: 16px;
+    font-weight: 600;
 }
 #movie p{
     margin-bottom: 0px;

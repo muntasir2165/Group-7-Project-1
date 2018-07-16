@@ -685,7 +685,7 @@ function generateWeatherWidgetHtml(response) {
     var cardHeader = $("<div>");
     cardHeader.addClass("card-header");
    
-    cardHeader.text("Weather for "+city+" , ON");
+    cardHeader.text("Weather for "+city);
     var cardBody = $("<div>");
     cardBody.addClass("card-body text-primary weather-row");
 
@@ -704,20 +704,22 @@ function generateWeatherWidgetHtml(response) {
 
     var cardFooter = $("<div>");
     cardFooter.addClass("card-footer bg-transparent border-success");
+    var cityForm = $("<form>");
     var cityInput=$("<input>");
     cityInput.attr("id","search-weather");
     cityInput.attr("type","text");
     cityInput.attr(palceholder="Venice");
     cityInput.attr("value","");
+    cityForm.append(cityInput);
 
     var citySubmitButton  = $("<button>");
     citySubmitButton.addClass("btn btn-default")
     citySubmitButton.attr("id","search");
     citySubmitButton.attr("type","submit");
     citySubmitButton.text("Search for a City");
+    cityForm.append(citySubmitButton);
     
-    cardFooter.append(cityInput);
-    cardFooter.append(citySubmitButton);
+    cardFooter.append(cityForm);
     
     card.append(cardHeader);
     card.append(cardBody);
@@ -733,6 +735,7 @@ function displayWeatherWidget(weatherWidgetHtml) {
 
 function searchCityWeatherEventListner() {
     $("body").on("click", "#search", function () {
+        event.preventDefault();
         var city = $("#search-weather").val();
         weatherWidget(city);
   });
@@ -1161,7 +1164,7 @@ function generateMovieWidgetHtml(response) {
 
     var cardBodyMovieInfoDiv = $("<div>");
     cardBodyMovieInfoDiv.addClass("movie-col");
-    cardBodyMovieInfoDiv.append($("<p>").addClass("").text("Actors: "));
+    cardBodyMovieInfoDiv.append($("<p>").addClass("actors").text("Actors: "));
     cardBodyMovieInfoDiv.append($("<p>").addClass("").text(newactors));
     cardBodyMovieInfoDiv.append($("<p>").addClass("rating").text("Ratings: "));
 
@@ -1175,19 +1178,21 @@ function generateMovieWidgetHtml(response) {
     var cardFooter = $("<div>");
     cardFooter.addClass("card-footer bg-transparent border-success");
     var movieInput = $("<input>");
+    var movieForm = $("<form>");
     movieInput.attr("id", "search-movie");
     movieInput.attr("type", "text");
     movieInput.attr(palceholder = "Matrix");
     movieInput.attr("value", "");
+    movieForm.append(movieInput);
 
     var movieSubmitButton = $("<button>");
     movieSubmitButton.addClass("btn btn-default")
     movieSubmitButton.attr("id", "search");
     movieSubmitButton.attr("type", "submit");
     movieSubmitButton.text("Search for a Movie");
+    movieForm.append(movieSubmitButton);
 
-    cardFooter.append(movieInput);
-    cardFooter.append(movieSubmitButton);
+    cardFooter.append(movieForm);
 
     card.append(cardHeader);
     card.append(cardBody);
